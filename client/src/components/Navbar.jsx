@@ -24,6 +24,12 @@ const Navbar = () => {
                 </svg>
                 Remove BG
             </button>
+            <button onClick={()=>navigate('/enhance')} className='flex items-center gap-1.5 bg-white/70 border border-gray-200 px-4 sm:px-5 py-1.5 transition-all duration-300 rounded-full hover:scale-105 hover:border-violet-400 hover:bg-violet-50 text-gray-600 text-xs sm:text-sm font-medium'>
+                <svg className='w-3.5 h-3.5 text-violet-500' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M13 10V3L4 14h7v7l9-11h-7z' />
+                </svg>
+                Enhance
+            </button>
             <button onClick={()=>navigate('/buycredit')} className='flex items-center gap-2 bg-blue-100 px-4 sm:px-6 py-1.5 transition-all duration-700 rounded-full hover:scale-105'>
                 <img className='w-5' src={assets.credit_star} alt="" />
                 <p className='text-xs sm:text-sm font-medium text-gray-600'>Credits left : {credit}</p>

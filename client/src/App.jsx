@@ -7,6 +7,7 @@ import Home from './pages/Home'
 import Result from './pages/Result'
 import BuyCredit from './pages/BuyCredit'
 import RemoveBg from './pages/RemoveBg'
+import Enhance from './pages/Enhance'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Login from './components/Login'
@@ -26,6 +27,7 @@ const App = () => {
         <Route path='/result' element={<Result/>}/>
         <Route path='/buycredit' element={<BuyCredit/>}/>
         <Route path='/remove-bg' element={<RemoveBg/>}/>
+        <Route path='/enhance' element={<Enhance/>}/>
     </Routes>
     <Footer/>
       

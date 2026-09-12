@@ -18,7 +18,6 @@ const AppContextProvider = (props) => {
     const loadCreditsData = async () => {
         try {
             const { data } = await axios.get(backendUrl + '/api/user/credits', { headers: { token } })
-
             if (data.success) {
                 setCredit(data.credits)
                 setUser(data.user)
@@ -32,18 +31,14 @@ const AppContextProvider = (props) => {
     const generateImage = async (prompt) => {
         try {
             const { data } = await axios.post(backendUrl + '/api/image/generate-image', { prompt }, { headers: { token } })
-
             if (data.success) {
                 loadCreditsData()
                 return data.resultImage
             } else {
                 toast.error(data.message)
                 loadCreditsData()
-                if (data.creditBalance === 0) {
-                    navigate('/buycredit')
-                }
+                if (data.creditBalance === 0) navigate('/buycredit')
             }
-
         } catch (error) {
             toast.error(error.message)
         }
@@ -53,22 +48,32 @@ const AppContextProvider = (props) => {
         try {
             const formData = new FormData()
             formData.append('image', imageFile)
-
-            const { data } = await axios.post(
-                backendUrl + '/api/image/remove-bg',
-                formData,
-                { headers: { token } }
-            )
-
+            const { data } = await axios.post(backendUrl + '/api/image/remove-bg', formData, { headers: { token } })
             if (data.success) {
                 loadCreditsData()
                 return data.resultImage
             } else {
                 toast.error(data.message)
                 loadCreditsData()
-                if (data.creditBalance === 0) {
-                    navigate('/buycredit')
-                }
+                if (data.creditBalance === 0) navigate('/buycredit')
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
+    const enhanceImage = async (imageFile) => {
+        try {
+            const formData = new FormData()
+            formData.append('image', imageFile)
+            const { data } = await axios.post(backendUrl + '/api/image/enhance', formData, { headers: { token } })
+            if (data.success) {
+                loadCreditsData()
+                return data.resultImage
+            } else {
+                toast.error(data.message)
+                loadCreditsData()
+                if (data.creditBalance === 0) navigate('/buycredit')
             }
         } catch (error) {
             toast.error(error.message)
@@ -82,14 +87,12 @@ const AppContextProvider = (props) => {
     }
 
     useEffect(() => {
-        if (token) {
-            loadCreditsData()
-        }
+        if (token) loadCreditsData()
     }, [token])
 
     const value = {
         user, setUser, showLogin, setShowLogin, backendUrl, token, setToken,
-        credit, setCredit, loadCreditsData, logout, generateImage, removeBg
+        credit, setCredit, loadCreditsData, logout, generateImage, removeBg, enhanceImage
     }
 
     return (

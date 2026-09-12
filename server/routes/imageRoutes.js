@@ -1,5 +1,5 @@
 import express from 'express'
-import { generateImage, removeBg } from '../controllers/imageController.js'
+import { generateImage, removeBg, enhanceImage } from '../controllers/imageController.js'
 import userAuth from '../middlewares/auth.js'
 import multer from 'multer'
 
@@ -11,5 +11,6 @@ const upload = multer({ storage })
 
 imageRouter.post('/generate-image', userAuth, generateImage)
 imageRouter.post('/remove-bg', upload.single('image'), userAuth, removeBg)
+imageRouter.post('/enhance', upload.single('image'), userAuth, enhanceImage)
 
 export default imageRouter
