@@ -1,41 +1,75 @@
 import React from 'react'
-import { assets } from '../assets/assets'
-import { motion } from "framer-motion"
+import { motion } from 'framer-motion'
 import how_it_works from '../assets/how_it_works.png'
+import { useNavigate } from 'react-router-dom'
 
 const Description = () => {
+  const navigate = useNavigate()
+
   return (
-    <motion.div
-    initial={{opacity:0.2, y:100}}
-    transition={{duration:1}}
-    whileInView={{opacity:1, y:0}}
-    viewport={{once:true}}
-    className='flex flex-col items-center justify-center my-24 p-6 md:px-28'>
+    <section className='w-full bg-surface-tile1 py-16 sm:py-20 select-none'>
+      <div className='max-w-[1024px] mx-auto px-4 sm:px-6'>
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center'>
+          {/* Left: Product image with product shadow and radius 18 */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+            className='flex justify-center'
+          >
+            <div className='w-full max-w-[460px] rounded-[18px] overflow-hidden shadow-2xl border border-white/10'>
+              <img
+                src={how_it_works}
+                alt='Imagify Interface'
+                className='w-full h-auto object-cover rounded-[18px]'
+                loading='lazy'
+              />
+            </div>
+          </motion.div>
 
-      <h1 className='text-3xl sm:text-4xl font-semibold mb-2'>Create AI Images</h1>
-  
-      <p className='text-gray-500 mb-8'>Turn your imagination into visuals</p>
-    
-      <div className='flex flex-col gap-5 md:gap-14 md:flex-row items-center'>
-        <img src={how_it_works} alt="" className='w-80 xl:w-96 rounded-3xl hover:scale-105 transition-all duration-300'/>
-        <div>
-            <h2 className='text-3xl font-medium max-w-lg mb-4'>Indroducing The AI-Powered Text To Image Generator</h2>
+          {/* Right: Dark Tile Copy Stack */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className='text-left text-body-onDark flex flex-col justify-center'
+          >
+            <span className='inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.06] border border-white/[0.08] text-primary-dark text-[12px] font-semibold tracking-wide uppercase mb-4'>
+              Studio Capabilities
+            </span>
 
-            <p className='text-gray-600 mb-4'>Easily bring your ideas to life with our free AI
-               image generator. Whether you need stunning visuals or
-               unique imagery, our tool transforms your text into
-               eye-catching images with just a few clicks. Imagine it,
-               describe it, and watch it come to life instantly.</p>
-            <p className='text-gray-600 mb-4'>Simply type in a text prompt, and our cutting-edge
-               AI will generate high-quality images in seconds. From
-               product visuals to character designs and portraits,
-               even concepts that don't yet exist can be visualized
-               effortlessly. Powered by advanced AI technology, the
-               creative possibilities are limitless!</p>
-        </div> 
+            <h2 className='font-display-md text-white mb-6 leading-tight'>
+              Intelligent visual synthesis. Engineered for precision.
+            </h2>
+
+            <p className='font-body text-body-muted text-[17px] mb-4'>
+              Easily bring your concepts to life with our high-throughput AI image generator. Whether you need cinematic keyframes, character design, or product visualization, Imagify transforms natural language descriptions into breathtaking assets with unmatched coherence.
+            </p>
+
+            <p className='font-body text-body-muted text-[17px] mb-8'>
+              Powered by advanced diffusion transformers and trained on multi-billion asset representations, every render delivers fine textures, photorealistic depth-of-field, and nuanced lighting in seconds.
+            </p>
+
+            <div className='flex flex-wrap items-center gap-4'>
+              <button
+                onClick={() => navigate('/result')}
+                className='inline-flex items-center gap-2 px-8 py-3 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm transition-all duration-200 hover:scale-105 active:scale-95 shadow-md'
+              >
+                Launch Studio
+              </button>
+              <button
+                onClick={() => navigate('/remove-bg')}
+                className='inline-flex items-center gap-2 px-7 py-3 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20 font-medium text-sm transition-all duration-200 hover:scale-105 active:scale-95'
+              >
+                Explore Background Eraser
+              </button>
+            </div>
+          </motion.div>
+        </div>
       </div>
-
-    </motion.div>
+    </section>
   )
 }
 

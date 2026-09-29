@@ -1,0 +1,11 @@
+{
+  "components": {
+    "timeline": {
+      "version": "1.0.0",
+      "installedAt": "2026-09-29T18:28:35.119Z",
+      "files": {
+        "src/components/effects/timeline/index.jsx": "sha256:e8d5db8cdcabfa0c42bbcaf4c25bb644ea2085dff49306ed31e097aed908b0ce"
+      }
+    }
+  }
+}

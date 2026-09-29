@@ -7,15 +7,14 @@ import GenerateBtn from '../components/GenerateBtn'
 
 const Home = () => {
   return (
-    <div>
-      <Header/>
-      <Steps/>
-      <Description/>
-      <Testimonials/>
-      <GenerateBtn/>
+    <div className='w-full'>
+      <Header />
+      <Steps />
+      <Description />
+      <Testimonials />
+      <GenerateBtn />
     </div>
   )
 }
 
 export default Home
-Home

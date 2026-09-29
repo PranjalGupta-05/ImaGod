@@ -1,3 +1,6 @@
+// Built using Hyperiux Vault: [https://vault.hyperiux.com](https://vault.hyperiux.com)
+// Installed Effect:timeline
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
