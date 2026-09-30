@@ -8,6 +8,7 @@ import Result from './pages/Result'
 import BuyCredit from './pages/BuyCredit'
 import RemoveBg from './pages/RemoveBg'
 import Enhance from './pages/Enhance'
+import Usage from './pages/Usage'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Login from './components/Login'
@@ -17,7 +18,7 @@ const App = () => {
   const { showLogin } = useContext(AppContext)
   const location = useLocation()
   // Dedicated tools & pricing studio pages remain clean and clutter-free without the directory footer
-  const hideFooterRoutes = ['/result', '/remove-bg', '/enhance', '/buycredit']
+  const hideFooterRoutes = ['/result', '/remove-bg', '/enhance', '/buycredit', '/usage']
   const showFooter = !hideFooterRoutes.includes(location.pathname)
 
   return (
@@ -30,11 +31,12 @@ const App = () => {
       />
       <Navbar />
       {showLogin && <Login />}
-      <main className='flex-1 w-full'>
+      <main className='flex-1 w-full bg-canvas flex flex-col'>
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/result' element={<Result />} />
           <Route path='/buycredit' element={<BuyCredit />} />
+          <Route path='/usage' element={<Usage />} />
           <Route path='/remove-bg' element={<RemoveBg />} />
           <Route path='/enhance' element={<Enhance />} />
         </Routes>

@@ -4,6 +4,29 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
 import SoftGradientBackground from '../components/SoftGradientBackground'
 
+// Grain texture overlay matching BuyCredit.jsx & Usage.jsx
+const GrainOverlay = () => (
+  <div
+    className='absolute inset-0 pointer-events-none opacity-[0.035] mix-blend-overlay rounded-[20px]'
+    style={{
+      backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+    }}
+  />
+)
+
+// Blue Theme Orb matching BuyCredit.jsx AvatarOrb style
+const ThemeOrb = ({ icon: Icon }) => (
+  <div
+    className='relative w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-transform duration-300 hover:scale-105 shadow-[0_8px_18px_-2px_rgba(37,99,235,0.40)]'
+    style={{
+      background: 'radial-gradient(circle at 35% 30%, #93c5fd 0%, #3b82f6 55%, #1d4ed8 100%)',
+    }}
+  >
+    <div className='absolute top-1.5 left-2 w-3.5 h-2 rounded-full bg-white/45 blur-[0.5px] -rotate-45 pointer-events-none' />
+    <Icon className='w-5 h-5 text-white z-10 stroke-[2]' />
+  </div>
+)
+
 const STYLES = [
   { id: 'natural', label: 'Natural / Raw', icon: '✨', suffix: '' },
   { id: 'photorealistic', label: 'Photorealistic', icon: '📸', suffix: ', hyperrealistic 8k resolution, shot on 35mm lens, natural studio lighting, ultra-detailed' },
@@ -174,54 +197,66 @@ export default function Result() {
   const activeStyle = STYLES.find((s) => s.id === selectedStyle)
 
   return (
-    <div className='relative w-full h-[100dvh] overflow-hidden select-none flex flex-col items-center justify-between'>
-      {/* ── SAME SOFT GRADIENT BACKGROUND AS HERO SECTION ── */}
-      <div className='absolute inset-0 z-0 pointer-events-none'>
-        <SoftGradientBackground />
-      </div>
+    <div className='relative w-full h-[100dvh] overflow-hidden select-none flex flex-col items-center justify-between bg-[#fafafc]'>
 
-      {/* Main Studio Wrapper - Constrained to 100% single view without clutter */}
+      {/* Main Studio Wrapper */}
       <div className='relative z-10 w-full max-w-3xl h-full flex flex-col justify-between min-h-0 pt-20 sm:pt-24 pb-5 px-3 sm:px-6'>
 
-        {/* ── CHAT FEED CONTAINER (Scrolls smoothly inside view if multiple chats) ── */}
+
+
+        {/* ── CHAT FEED CONTAINER ── */}
         <div
           ref={chatContainerRef}
           className='flex-1 w-full overflow-y-auto px-1 sm:px-2 py-2 space-y-4 scroll-smooth min-h-0'
         >
           {messages.length === 0 ? (
-            /* Empty State: Clean, Minimalist Welcome (No clutter, No cartoon boy picture) */
-            <div className='h-full flex flex-col items-center justify-center text-center px-4'>
+            /* Empty State: Themed Signature Card */
+            <div className='h-full flex flex-col items-center justify-center text-center px-2 sm:px-4 py-4'>
               <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 0, scale: 0.96 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-                className='flex flex-col items-center max-w-md'
+                transition={{ duration: 0.4 }}
+                className='w-full max-w-[560px] bg-white rounded-[26px] border border-[#e5e5e7] p-3 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_36px_rgba(0,0,0,0.07)] transition-all'
               >
-                <div className='w-12 h-12 rounded-2xl bg-white/70 backdrop-blur-md border border-white/60 text-blue-600 flex items-center justify-center shadow-sm mb-3'>
-                  <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.8} d='M13 10V3L4 14h7v7l9-11h-7z' />
-                  </svg>
-                </div>
-                <h2 className='text-2xl sm:text-3xl font-semibold text-neutral-900 tracking-tight'>
-                  What will you imagine today?
-                </h2>
-                <p className='text-xs sm:text-sm text-neutral-500 mt-1.5 leading-relaxed'>
-                  Describe your idea in the chat input below to synthesize high-resolution artwork.
-                </p>
+                <div
+                  className='rounded-[20px] p-6 sm:p-8 relative overflow-hidden border border-blue-200 flex flex-col items-center'
+                  style={{
+                    background: 'linear-gradient(180deg, #dbeafe 0%, #eff6ff 45%, #ffffff 100%)',
+                  }}
+                >
+                  <GrainOverlay />
 
-                {/* Quick Inspiration Prompts Grid */}
-                <div className='grid grid-cols-1 sm:grid-cols-2 gap-2 mt-6 w-full'>
-                  {CURATED_PROMPTS.slice(0, 4).map((prompt, idx) => (
-                    <button
-                      key={idx}
-                      type='button'
-                      onClick={() => handleSendMessage(prompt)}
-                      className='p-3 rounded-2xl bg-white/60 hover:bg-white/90 backdrop-blur-md border border-white/60 shadow-xs hover:shadow-sm text-left text-xs text-neutral-700 hover:text-neutral-900 transition-all flex items-start gap-2 group'
-                    >
-                      <span className='text-neutral-400 group-hover:text-blue-500 transition-colors'>↳</span>
-                      <span className='line-clamp-2 leading-snug'>{prompt}</span>
-                    </button>
-                  ))}
+                  <div className='relative z-10 mb-4'>
+                    <ThemeOrb
+                      icon={() => (
+                        <svg className='w-5 h-5 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M13 10V3L4 14h7v7l9-11h-7z' />
+                        </svg>
+                      )}
+                    />
+                  </div>
+
+                  <h2 className='text-2xl sm:text-3xl font-bold text-ink tracking-tight relative z-10'>
+                    What will you imagine today?
+                  </h2>
+                  <p className='text-xs sm:text-sm text-[#6e6e73] mt-2 max-w-sm mx-auto leading-relaxed relative z-10'>
+                    Type your creative prompt below to synthesize high-resolution imagery with lighting & texture details.
+                  </p>
+
+                  {/* Quick Inspiration Prompts Grid */}
+                  <div className='grid grid-cols-1 sm:grid-cols-2 gap-2 mt-5 w-full relative z-10'>
+                    {CURATED_PROMPTS.slice(0, 4).map((prompt, idx) => (
+                      <button
+                        key={idx}
+                        type='button'
+                        onClick={() => handleSendMessage(prompt)}
+                        className='p-3 rounded-[14px] bg-white/80 hover:bg-white border border-blue-200/80 shadow-2xs hover:shadow-xs text-left text-xs text-neutral-800 transition-all flex items-start gap-2 group cursor-pointer'
+                      >
+                        <span className='text-blue-500 font-bold'>↳</span>
+                        <span className='line-clamp-2 leading-snug'>{prompt}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             </div>
@@ -345,7 +380,7 @@ export default function Result() {
 
         {/* ── BOTTOM DOCKED "AI CHAT INPUT" BAR ── */}
         <div className='w-full shrink-0 pt-2'>
-          <div className='w-full relative bg-white/70 backdrop-blur-xl border border-white/60 rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.05)] focus-within:ring-2 focus-within:ring-blue-500/30 focus-within:border-blue-500/50 transition-all'>
+          <div className='w-full relative bg-white border border-[#e5e5e7] rounded-[24px] shadow-[0_4px_24px_rgba(0,0,0,0.06)] focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500/50 transition-all'>
             
             {/* Top Prompt Input Area */}
             <div className='p-3.5 pb-1 flex items-start gap-2'>

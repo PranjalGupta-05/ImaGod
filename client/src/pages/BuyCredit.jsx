@@ -308,56 +308,21 @@ const BuyCredit = () => {
   }
 
   return (
-    <div className='w-full min-h-[calc(100vh-96px)] bg-[#fafafc] pt-24 sm:pt-28 pb-20 select-none'>
-      <div className='max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8'>
-        {/* Header Stack with Title & Tab Switcher (matching Pricing 6 composition) */}
+    <div className='w-full min-h-screen lg:h-screen lg:max-h-screen lg:overflow-hidden bg-[#fafafc] pt-20 sm:pt-22 pb-4 select-none flex flex-col justify-center'>
+      <div className='max-w-[1180px] mx-auto px-4 sm:px-6 w-full'>
+        {/* Header Stack with Title */}
         <motion.div
-          initial={{ opacity: 0, y: -12 }}
+          initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className='flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 sm:mb-16'
+          transition={{ duration: 0.4 }}
+          className='mb-3 sm:mb-4'
         >
-          <div>
-            <div className='inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-[#e5e5e7] shadow-sm mb-4'>
-              <span className='font-semibold text-ink text-[13px]'>Imagify Store</span>
-              <span className='text-[#86868b] text-[12px]'>·</span>
-              <span className='text-[#6e6e73] text-[13px]'>
-                {user ? `Current Balance: ${credit} Credits` : 'Instant Delivery'}
-              </span>
-            </div>
-            <h1 className='text-3xl sm:text-4xl lg:text-[44px] font-bold text-ink tracking-tight leading-tight'>
-              Simple, transparent pricing
-            </h1>
-            <p className='text-base sm:text-lg text-[#6e6e73] mt-2 max-w-[560px]'>
-              No hidden fees. Choose the plan that works for you.
-            </p>
-          </div>
-
-          {/* Right-aligned Tab Switcher */}
-          <div className='inline-flex p-1 bg-[#ededf0] rounded-full border border-black/5 self-start md:self-auto shrink-0 shadow-inner'>
-            <button
-              type='button'
-              onClick={() => setActiveTab('individuals')}
-              className={`px-5 py-2 rounded-full text-[14px] font-medium transition-all duration-200 cursor-pointer ${
-                activeTab === 'individuals'
-                  ? 'bg-white text-ink shadow-[0_2px_8px_rgba(0,0,0,0.08)]'
-                  : 'text-[#6e6e73] hover:text-ink'
-              }`}
-            >
-              Individuals
-            </button>
-            <button
-              type='button'
-              onClick={() => setActiveTab('teams')}
-              className={`px-5 py-2 rounded-full text-[14px] font-medium transition-all duration-200 cursor-pointer ${
-                activeTab === 'teams'
-                  ? 'bg-white text-ink shadow-[0_2px_8px_rgba(0,0,0,0.08)]'
-                  : 'text-[#6e6e73] hover:text-ink'
-              }`}
-            >
-              Teams & Enterprise
-            </button>
-          </div>
+          <h1 className='text-2xl sm:text-3xl lg:text-[34px] font-bold text-ink tracking-tight leading-tight'>
+            Simple, transparent pricing
+          </h1>
+          <p className='text-sm sm:text-base text-[#6e6e73] mt-1 max-w-[560px]'>
+            No hidden fees. Choose the plan that works for you.
+          </p>
         </motion.div>
 
         {/* 3-Column Pricing Grid */}
@@ -368,7 +333,7 @@ const BuyCredit = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -15 }}
             transition={{ duration: 0.35 }}
-            className='grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-7 items-stretch mb-16'
+            className='grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6 items-stretch mb-0'
           >
             {displayedPlans.map((plan, index) => {
               const isProcessing = processingPlan === plan.id
@@ -376,11 +341,11 @@ const BuyCredit = () => {
               return (
                 <div
                   key={plan.id}
-                  className='bg-white rounded-[26px] border border-[#e5e5e7] p-3 flex flex-col justify-between shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_36px_rgba(0,0,0,0.07)] transition-all duration-300'
+                  className='bg-white rounded-[24px] border border-[#e5e5e7] p-2.5 flex flex-col justify-between shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_36px_rgba(0,0,0,0.07)] transition-all duration-300'
                 >
                   {/* Top Gradient Inset Box with Avatar Orb & Price */}
                   <div
-                    className='rounded-[20px] p-6 relative overflow-hidden border'
+                    className='rounded-[18px] p-4 sm:p-5 relative overflow-hidden border'
                     style={{
                       background: plan.gradientBg,
                       borderColor: plan.borderColor,
@@ -392,37 +357,37 @@ const BuyCredit = () => {
                     <div className='flex items-center justify-between relative z-10'>
                       <AvatarOrb theme={plan.theme} />
                       {plan.badge && (
-                        <span className='px-3 py-1 rounded-full bg-black/10 backdrop-blur-sm text-[12px] font-medium text-ink'>
+                        <span className='px-2.5 py-0.5 rounded-full bg-black/10 backdrop-blur-sm text-[11px] font-semibold text-ink'>
                           {plan.badge}
                         </span>
                       )}
                     </div>
 
                     {/* Plan Title & Description */}
-                    <div className='mt-5 relative z-10'>
-                      <h3 className='text-[22px] font-bold text-ink tracking-tight'>
+                    <div className='mt-3 relative z-10'>
+                      <h3 className='text-[19px] font-bold text-ink tracking-tight'>
                         {plan.title}
                       </h3>
-                      <p className='text-[13px] text-[#4b5563] mt-1.5 leading-relaxed min-h-[38px]'>
+                      <p className='text-[12px] text-[#4b5563] mt-1 leading-relaxed min-h-[32px]'>
                         {plan.desc}
                       </p>
                     </div>
 
                     {/* Price Block */}
-                    <div className='mt-5 relative z-10'>
+                    <div className='mt-3 relative z-10'>
                       <div className='flex items-baseline gap-2'>
-                        <span className='text-[38px] font-bold text-ink tracking-tight'>
+                        <span className='text-[32px] font-bold text-ink tracking-tight leading-none'>
                           {typeof plan.price === 'number' ? `$${plan.price}` : plan.price}
                         </span>
                         {plan.anchorPrice && (
-                          <span className='text-[18px] text-[#9ca3af] line-through font-normal'>
+                          <span className='text-[15px] text-[#9ca3af] line-through font-normal'>
                             {typeof plan.anchorPrice === 'number'
                               ? `$${plan.anchorPrice}`
                               : plan.anchorPrice}
                           </span>
                         )}
                       </div>
-                      <p className='text-[13px] text-[#6b7280] mt-0.5'>
+                      <p className='text-[12px] text-[#6b7280] mt-1'>
                         {typeof plan.credits === 'number'
                           ? `One-time payment · ${plan.credits.toLocaleString()} Credits`
                           : 'Custom enterprise volume'}
@@ -430,12 +395,12 @@ const BuyCredit = () => {
                     </div>
 
                     {/* CTA Button inside the gradient header */}
-                    <div className='mt-6 relative z-10'>
+                    <div className='mt-4 relative z-10'>
                       <button
                         type='button'
                         onClick={() => handlePlanAction(plan)}
                         disabled={isProcessing}
-                        className={`w-full py-3 px-5 rounded-full font-medium text-[15px] transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50 ${
+                        className={`w-full py-2.5 px-4 rounded-full font-semibold text-[14px] transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50 ${
                           plan.btnType === 'dark'
                             ? 'bg-[#1d1d1f] hover:bg-black text-white shadow-[0_2px_8px_rgba(0,0,0,0.18)]'
                             : 'bg-white hover:bg-[#f9fafb] text-ink border border-black/10 shadow-[0_1px_3px_rgba(0,0,0,0.06)]'
@@ -454,76 +419,32 @@ const BuyCredit = () => {
                     </div>
                   </div>
 
-                  {/* Bottom Features Checklist & Guarantee */}
-                  <div className='px-4 sm:px-5 pt-6 pb-4 flex flex-col justify-between flex-1'>
-                    {/* Feature Items List */}
-                    <ul className='space-y-3 mb-6'>
-                      {plan.features.map((feature, fIdx) => (
-                        <li key={fIdx} className='flex items-start gap-2.5 text-[14px] text-ink'>
+                  {/* Bottom Features Checklist */}
+                  <div className='px-4 pt-3.5 pb-2 flex flex-col justify-between flex-1'>
+                    <ul className='space-y-2'>
+                      {plan.features.slice(0, 4).map((feature, fIdx) => (
+                        <li key={fIdx} className='flex items-center gap-2 text-[13px] text-ink'>
                           <svg
-                            className='w-4 h-4 text-[#4b5563] shrink-0 mt-0.5'
+                            className='w-3.5 h-3.5 text-emerald-600 shrink-0'
                             viewBox='0 0 24 24'
                             fill='none'
                             stroke='currentColor'
-                            strokeWidth='2.2'
+                            strokeWidth='2.4'
                             strokeLinecap='round'
                             strokeLinejoin='round'
                           >
                             <polyline points='20 6 9 17 4 12' />
                           </svg>
-                          <span className='leading-snug'>{feature}</span>
+                          <span className='leading-snug truncate'>{feature}</span>
                         </li>
                       ))}
                     </ul>
-
-                    {/* Bottom Footer Note (Matching Pricing 6) */}
-                    <div className='pt-5 border-t border-[#f0f0f2]'>
-                      <p className='text-[13px] font-semibold text-ink'>
-                        {plan.footerTitle}
-                      </p>
-                      <p className='text-[12px] text-[#6e6e73] mt-1 leading-relaxed'>
-                        {plan.footerDesc}
-                      </p>
-                    </div>
                   </div>
                 </div>
               )
             })}
           </motion.div>
         </AnimatePresence>
-
-        {/* Security & FAQ Trust Strip */}
-        <div className='max-w-[840px] mx-auto p-6 bg-white border border-[#e5e5e7] rounded-[20px] flex flex-col sm:flex-row items-center justify-between gap-6 text-left shadow-sm'>
-          <div className='flex items-center gap-3.5'>
-            <div className='w-11 h-11 rounded-full bg-[#f5f5f7] flex items-center justify-center shrink-0 text-primary'>
-              <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={1.8}
-                  d='M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z'
-                />
-              </svg>
-            </div>
-            <div>
-              <p className='text-[14px] font-semibold text-ink'>
-                Encrypted Razorpay Checkout
-              </p>
-              <p className='text-[13px] text-[#6e6e73]'>
-                Credits are added automatically to your account upon payment confirmation.
-              </p>
-            </div>
-          </div>
-
-          <div className='text-right shrink-0'>
-            <a
-              href='mailto:invoicing@imagify.ai?subject=Enterprise%20Invoicing%20Request'
-              className='text-[13px] font-medium text-primary hover:underline'
-            >
-              Need enterprise invoicing? &gt;
-            </a>
-          </div>
-        </div>
       </div>
     </div>
   )

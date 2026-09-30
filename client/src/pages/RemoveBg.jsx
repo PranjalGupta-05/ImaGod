@@ -2,7 +2,37 @@ import React, { useContext, useRef, useState, useCallback } from 'react'
 import { AppContext } from '../context/AppContext'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
-import SoftGradientBackground from '../components/SoftGradientBackground'
+import {
+  Scissors,
+  Upload,
+  ArrowRight,
+  Download,
+  RotateCcw,
+  Sparkles,
+} from 'lucide-react'
+
+// Grain texture overlay matching BuyCredit.jsx & Usage.jsx
+const GrainOverlay = () => (
+  <div
+    className='absolute inset-0 pointer-events-none opacity-[0.035] mix-blend-overlay rounded-[20px]'
+    style={{
+      backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+    }}
+  />
+)
+
+// Purple Theme Orb matching BuyCredit.jsx AvatarOrb style
+const ThemeOrb = ({ icon: Icon }) => (
+  <div
+    className='relative w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-transform duration-300 hover:scale-105 shadow-[0_8px_18px_-2px_rgba(139,92,246,0.40)]'
+    style={{
+      background: 'radial-gradient(circle at 35% 30%, #d8b4fe 0%, #8b5cf6 55%, #6d28d9 100%)',
+    }}
+  >
+    <div className='absolute top-1.5 left-2 w-3.5 h-2 rounded-full bg-white/45 blur-[0.5px] -rotate-45 pointer-events-none' />
+    <Icon className='w-5 h-5 text-white z-10 stroke-[2]' />
+  </div>
+)
 
 const RemoveBg = () => {
   const { removeBg, credit, user, setShowLogin } = useContext(AppContext)
@@ -79,72 +109,88 @@ const RemoveBg = () => {
 
   return (
     <div
-      className='relative w-full min-h-[calc(100vh-80px)] overflow-hidden select-none flex flex-col items-center justify-center pt-24 sm:pt-28 pb-16 sm:pb-20'
+      className='w-full min-h-screen lg:h-screen lg:max-h-screen lg:overflow-hidden bg-[#fafafc] pt-20 sm:pt-22 pb-4 select-none flex flex-col items-center justify-center'
       onMouseMove={onSliderMouseMove}
       onMouseUp={onSliderMouseUp}
       onTouchMove={onSliderMouseMove}
       onTouchEnd={onSliderMouseUp}
     >
-      {/* ── Soft animated gradient background matching Hero & Studio sections ── */}
-      <div className='absolute inset-0 z-0 pointer-events-none'>
-        <SoftGradientBackground />
-      </div>
+      <div className='max-w-[840px] mx-auto px-4 sm:px-6 w-full text-center flex flex-col items-center'>
 
-      <div className='relative z-10 max-w-[840px] mx-auto px-4 sm:px-6 w-full text-center flex flex-col items-center'>
-        {/* Page Header */}
+        {/* ── Page Header ── */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className='mb-8'
+          transition={{ duration: 0.4 }}
+          className='mb-3 text-center flex flex-col items-center'
         >
-          <div className='inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/70 backdrop-blur-xl border border-white/60 shadow-xs mb-4'>
-            <span className='font-caption-strong text-ink'>Background Eraser</span>
-            <span className='text-neutral-400 text-[12px]'>·</span>
-            <span className='text-neutral-500 font-caption text-[13px]'>
-              {user ? `${credit} Credits Left` : '1 Credit Per Image'}
-            </span>
-          </div>
-
-          <h1 className='font-display-lg text-ink'>
-            Erase backgrounds with pixel precision.
+          <h1 className='text-2xl sm:text-3xl lg:text-[34px] font-bold text-ink tracking-tight leading-tight'>
+            Erase backgrounds with pixel precision
           </h1>
-          <p className='font-lead text-[#7a7a7a] mt-2 max-w-[540px] mx-auto text-[19px]'>
+          <p className='text-sm sm:text-base text-[#6e6e73] mt-1 max-w-[520px] mx-auto'>
             Upload any portrait, product, or object. Our neural mask isolates foregrounds with clean transparent PNG output.
           </p>
         </motion.div>
 
-        {/* Upload Zone */}
+        {/* ── Upload Zone: Signature Double-Card Container ── */}
         {!originalImage && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.96 }}
+            initial={{ opacity: 0, scale: 0.97 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            onClick={() => fileInputRef.current?.click()}
-            onDragOver={(e) => {
-              e.preventDefault()
-              setDragOver(true)
-            }}
-            onDragLeave={() => setDragOver(false)}
-            onDrop={onDrop}
-            className={`w-full max-w-[620px] h-64 sm:h-72 rounded-[22px] border-2 border-dashed flex flex-col items-center justify-center gap-4 cursor-pointer transition-all bg-white/70 backdrop-blur-xl shadow-sm hover:shadow-md ${
-              dragOver
-                ? 'border-blue-500 ring-4 ring-blue-500/10 bg-white/90'
-                : 'border-white/80 hover:border-blue-400/60 hover:bg-white/85'
-            }`}
+            transition={{ duration: 0.4 }}
+            className='w-full max-w-[560px]'
           >
-            <div className='w-14 h-14 rounded-2xl bg-white/80 backdrop-blur-md flex items-center justify-center border border-white/80 text-blue-600 shadow-sm'>
-              <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.8} d='M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z' />
-              </svg>
-            </div>
-            <div>
-              <p className='font-body-strong text-neutral-900 text-[17px] font-semibold'>
-                {dragOver ? 'Drop image here' : 'Drag & drop your photo here'}
-              </p>
-              <p className='font-caption text-neutral-500 mt-1 text-sm'>
-                or <span className='text-blue-600 font-semibold underline underline-offset-2'>browse files</span> · PNG, JPG, WEBP supported
-              </p>
+            <div className='bg-white rounded-[24px] border border-[#e5e5e7] p-2.5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_36px_rgba(0,0,0,0.07)] transition-all duration-300'>
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                onDragOver={(e) => {
+                  e.preventDefault()
+                  setDragOver(true)
+                }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={onDrop}
+                className={`rounded-[18px] p-6 sm:p-7 relative overflow-hidden border border-dashed transition-all cursor-pointer flex flex-col items-center justify-center gap-3 ${
+                  dragOver
+                    ? 'border-purple-500 bg-purple-100/60 ring-4 ring-purple-500/10'
+                    : 'border-purple-200/90 hover:border-purple-400 hover:bg-purple-50/40'
+                }`}
+                style={{
+                  background: dragOver
+                    ? undefined
+                    : 'linear-gradient(180deg, #ede9fe 0%, #f5f3ff 45%, #ffffff 100%)',
+                }}
+              >
+                <GrainOverlay />
+
+                {/* Orb */}
+                <div className='relative z-10'>
+                  <ThemeOrb icon={Scissors} />
+                </div>
+
+                {/* Text Block */}
+                <div className='relative z-10 text-center'>
+                  <h3 className='text-[18px] font-bold text-ink tracking-tight'>
+                    {dragOver ? 'Drop image right here' : 'Choose an image to erase background'}
+                  </h3>
+                  <p className='text-[12px] text-[#6b7280] mt-0.5'>
+                    Drag & drop your file here, or{' '}
+                    <span className='text-purple-700 font-semibold underline underline-offset-2'>
+                      browse computer
+                    </span>
+                  </p>
+                  <p className='text-[11px] text-[#9ca3af] mt-0.5'>
+                    Supports PNG, JPG, WEBP up to 25MB
+                  </p>
+                </div>
+
+                {/* Action button inside dropzone */}
+                <div className='relative z-10'>
+                  <span className='inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white hover:bg-purple-50 text-purple-700 border border-purple-200/90 shadow-2xs text-[12px] font-semibold transition-all'>
+                    <Upload className='w-3.5 h-3.5' />
+                    Select Image File
+                  </span>
+                </div>
+              </div>
             </div>
           </motion.div>
         )}
@@ -157,52 +203,73 @@ const RemoveBg = () => {
           onChange={onFileChange}
         />
 
-        {/* Image Preview + Process Button */}
+        {/* ── Preview & Processing Card ── */}
         <AnimatePresence>
           {originalImage && !resultImage && (
             <motion.div
               key='preview'
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4 }}
-              className='flex flex-col items-center gap-6 w-full max-w-[560px]'
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+              className='w-full max-w-[540px] flex flex-col items-center gap-3.5'
             >
-              <div className='relative w-full rounded-[22px] overflow-hidden shadow-xl bg-white/75 backdrop-blur-xl border border-white/80 aspect-square max-h-[420px] flex items-center justify-center'>
-                <img
-                  src={originalImage}
-                  alt='Preview'
-                  className='w-full h-full object-contain rounded-[22px]'
-                />
+              <div className='w-full bg-white rounded-[24px] border border-[#e5e5e7] p-2.5 shadow-[0_2px_12px_rgba(0,0,0,0.03)]'>
+                <div
+                  className='rounded-[18px] p-3 relative overflow-hidden border border-purple-200 flex flex-col items-center justify-center'
+                  style={{
+                    background: 'linear-gradient(180deg, #ede9fe 0%, #f5f3ff 45%, #ffffff 100%)',
+                  }}
+                >
+                  <GrainOverlay />
 
-                {loading && (
-                  <div className='absolute inset-0 bg-white/85 backdrop-blur-md flex flex-col items-center justify-center gap-4'>
-                    <div className='w-10 h-10 border-2 border-blue-600 border-t-transparent rounded-full animate-spin' />
-                    <div className='text-center'>
-                      <p className='font-body-strong text-neutral-900 text-[16px] font-semibold'>
-                        Erasing background…
-                      </p>
-                      <p className='font-caption text-neutral-500 mt-1'>
-                        Calculating alpha matte boundaries
-                      </p>
-                    </div>
+                  <div className='relative z-10 w-full rounded-[14px] overflow-hidden bg-white/70 border border-purple-100 aspect-square max-h-[38vh] flex items-center justify-center shadow-xs'>
+                    <img
+                      src={originalImage}
+                      alt='Preview'
+                      className='w-full h-full object-contain'
+                    />
+
+                    {loading && (
+                      <div className='absolute inset-0 bg-white/90 backdrop-blur-md flex flex-col items-center justify-center gap-3 z-20'>
+                        <div className='w-9 h-9 border-3 border-purple-600 border-t-transparent rounded-full animate-spin' />
+                        <div className='text-center'>
+                          <p className='text-ink font-bold text-[15px]'>
+                            Erasing background…
+                          </p>
+                          <p className='text-[12px] text-[#6b7280] mt-0.5'>
+                            Calculating high-precision alpha boundaries
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
 
-              {/* Action buttons */}
-              <div className='flex flex-wrap gap-3 justify-center'>
+              {/* Actions */}
+              <div className='flex flex-wrap gap-2.5 justify-center'>
                 <button
                   onClick={onSubmit}
                   disabled={loading}
-                  className='flex items-center gap-2 bg-gray-900 text-white px-8 py-3 rounded-full font-medium text-sm hover:bg-gray-700 transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg disabled:opacity-50'
+                  className='px-7 py-2.5 rounded-full font-semibold text-[14px] bg-[#1d1d1f] hover:bg-black text-white shadow-[0_2px_10px_rgba(0,0,0,0.16)] transition-all flex items-center gap-2 active:scale-95 disabled:opacity-50 cursor-pointer'
                 >
-                  {loading ? 'Processing…' : 'Remove Background'}
+                  {loading ? (
+                    <>
+                      <span className='inline-block w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin' />
+                      <span>Processing…</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Remove Background</span>
+                      <ArrowRight className='w-3.5 h-3.5' />
+                    </>
+                  )}
                 </button>
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={loading}
-                  className='border border-gray-300 text-gray-600 px-6 py-3 rounded-full text-sm hover:border-gray-400 transition-all hover:scale-105 active:scale-95'
+                  className='px-5 py-2.5 rounded-full text-[13px] font-semibold bg-white hover:bg-purple-50 text-purple-700 border border-purple-200 shadow-2xs transition-all active:scale-95 cursor-pointer'
                 >
                   Change Image
                 </button>
@@ -210,97 +277,104 @@ const RemoveBg = () => {
             </motion.div>
           )}
 
-          {/* Before/After Interactive Comparison Slider */}
+          {/* ── Result Comparison Slider ── */}
           {resultImage && (
             <motion.div
               key='result'
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className='flex flex-col items-center gap-6 w-full max-w-[620px]'
+              transition={{ duration: 0.3 }}
+              className='w-full max-w-[580px] flex flex-col items-center gap-3.5'
             >
-              <p className='font-caption text-neutral-500 text-sm'>
-                Drag the divider to compare original vs. transparent background
-              </p>
-
-              {/* Before/After slider frame */}
-              <div
-                ref={sliderContainerRef}
-                className='relative w-full rounded-[22px] overflow-hidden shadow-xl select-none cursor-col-resize border border-white/80 bg-white/80 backdrop-blur-xl'
-                style={{ aspectRatio: '4/3' }}
-                onMouseDown={onSliderMouseDown}
-                onTouchStart={onSliderMouseDown}
-              >
-                {/* BEFORE (clipped by sliderPos) */}
-                <img
-                  src={originalImage}
-                  alt='Original Before'
-                  className='absolute inset-0 w-full h-full object-contain'
-                  style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
-                  draggable={false}
-                />
-
-                {/* AFTER on Apple checkerboard transparency background */}
+              <div className='w-full bg-white rounded-[24px] border border-[#e5e5e7] p-2.5 shadow-[0_2px_12px_rgba(0,0,0,0.03)]'>
                 <div
-                  className='absolute inset-0 w-full h-full'
-                  style={{ clipPath: `inset(0 0 0 ${sliderPos}%)` }}
+                  className='rounded-[18px] p-3 relative overflow-hidden border border-purple-200'
+                  style={{
+                    background: 'linear-gradient(180deg, #ede9fe 0%, #f5f3ff 45%, #ffffff 100%)',
+                  }}
                 >
+                  <GrainOverlay />
+
+                  {/* Slider Frame */}
                   <div
-                    className='absolute inset-0 opacity-40'
-                    style={{
-                      backgroundImage: 'repeating-conic-gradient(#e0e0e0 0% 25%, #ffffff 0% 50%)',
-                      backgroundSize: '16px 16px',
-                    }}
-                  />
-                  <img
-                    src={resultImage}
-                    alt='Extracted Transparent'
-                    className='absolute inset-0 w-full h-full object-contain'
-                    draggable={false}
-                  />
-                </div>
+                    ref={sliderContainerRef}
+                    className='relative w-full rounded-[14px] overflow-hidden select-none cursor-col-resize border border-purple-200 bg-white shadow-2xs max-h-[38vh]'
+                    style={{ aspectRatio: '4/3' }}
+                    onMouseDown={onSliderMouseDown}
+                    onTouchStart={onSliderMouseDown}
+                  >
+                    {/* Before Image */}
+                    <img
+                      src={originalImage}
+                      alt='Original Before'
+                      className='absolute inset-0 w-full h-full object-contain'
+                      style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
+                      draggable={false}
+                    />
 
-                {/* Slider divider line */}
-                <div
-                  className='absolute top-0 bottom-0 w-[2px] bg-white pointer-events-none shadow-md'
-                  style={{ left: `${sliderPos}%` }}
-                >
-                  {/* Circular control handle */}
-                  <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/95 backdrop-blur-md border border-white/80 flex items-center justify-center pointer-events-none shadow-md'>
-                    <svg className='w-4 h-4 text-neutral-800' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M8 9l-4 3 4 3M16 9l4 3-4 3' />
-                    </svg>
+                    {/* After Image on transparency checkerboard */}
+                    <div
+                      className='absolute inset-0 w-full h-full'
+                      style={{ clipPath: `inset(0 0 0 ${sliderPos}%)` }}
+                    >
+                      <div
+                        className='absolute inset-0 opacity-40'
+                        style={{
+                          backgroundImage: 'repeating-conic-gradient(#e0e0e0 0% 25%, #ffffff 0% 50%)',
+                          backgroundSize: '16px 16px',
+                        }}
+                      />
+                      <img
+                        src={resultImage}
+                        alt='Transparent Cutout'
+                        className='absolute inset-0 w-full h-full object-contain'
+                        draggable={false}
+                      />
+                    </div>
+
+                    {/* Slider divider line */}
+                    <div
+                      className='absolute top-0 bottom-0 w-[2px] bg-white pointer-events-none shadow-md'
+                      style={{ left: `${sliderPos}%` }}
+                    >
+                      <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/95 backdrop-blur-md border border-purple-300 flex items-center justify-center pointer-events-none shadow-md'>
+                        <Scissors className='w-3.5 h-3.5 text-purple-700' />
+                      </div>
+                    </div>
+
+                    {/* Pill labels */}
+                    <span className='absolute top-2.5 left-2.5 bg-white/90 backdrop-blur-md border border-purple-200 text-purple-900 text-[11px] font-semibold px-2.5 py-0.5 rounded-full shadow-2xs'>
+                      Original
+                    </span>
+                    <span className='absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-md border border-purple-200 text-purple-900 text-[11px] font-semibold px-2.5 py-0.5 rounded-full shadow-2xs'>
+                      Transparent
+                    </span>
                   </div>
-                </div>
 
-                {/* Pill labels */}
-                <span className='absolute top-3 left-3 bg-white/80 backdrop-blur-md border border-white/60 text-neutral-800 text-[12px] font-caption-strong px-2.5 py-1 rounded-full shadow-xs'>
-                  Original
-                </span>
-                <span className='absolute top-3 right-3 bg-white/80 backdrop-blur-md border border-white/60 text-neutral-800 text-[12px] font-caption-strong px-2.5 py-1 rounded-full shadow-xs'>
-                  Removed
-                </span>
+                  <p className='text-[12px] text-[#6b7280] text-center mt-2 font-medium'>
+                    Drag the divider across to inspect edge quality & transparency
+                  </p>
+                </div>
               </div>
 
               {/* Actions */}
-              <div className='flex flex-wrap gap-3 justify-center'>
+              <div className='flex flex-wrap gap-2.5 justify-center'>
                 <a
                   href={resultImage}
                   download='removed-bg.png'
                   target='_blank'
                   rel='noreferrer'
-                  className='flex items-center gap-2 bg-gray-900 text-white px-8 py-3 rounded-full font-medium text-sm hover:bg-gray-700 transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg'
+                  className='px-7 py-2.5 rounded-full font-semibold text-[14px] bg-[#1d1d1f] hover:bg-black text-white shadow-[0_2px_10px_rgba(0,0,0,0.16)] transition-all flex items-center gap-2 active:scale-95 cursor-pointer'
                 >
-                  <svg className='w-4 h-4 mr-1' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4' />
-                  </svg>
-                  Download PNG
+                  <Download className='w-3.5 h-3.5' />
+                  <span>Download Clean PNG</span>
                 </a>
                 <button
                   onClick={reset}
-                  className='border border-gray-300 text-gray-600 px-6 py-3 rounded-full text-sm hover:border-gray-400 transition-all hover:scale-105 active:scale-95'
+                  className='px-5 py-2.5 rounded-full text-[13px] font-semibold bg-white hover:bg-purple-50 text-purple-700 border border-purple-200 shadow-2xs transition-all flex items-center gap-2 active:scale-95 cursor-pointer'
                 >
-                  Try Another Image
+                  <RotateCcw className='w-3.5 h-3.5' />
+                  <span>Try Another Image</span>
                 </button>
               </div>
             </motion.div>

@@ -10,6 +10,8 @@ export default {
         full: '9999px',
       },
       colors: {
+        canvas: '#fafafc',
+        ink: '#1d1d1f',
         primary: {
           DEFAULT: '#0066cc',
           focus: '#0071e3',
