@@ -152,37 +152,37 @@ const VideoHero = () => {
               }}
               className="absolute inset-x-0 transition-opacity duration-75"
             >
-              {/* Eyebrow — 13px, medium weight, wide tracking */}
-              <p
-                className="text-[13px] font-medium tracking-[0.08em] uppercase text-neutral-500 mb-4"
-              >
-                AI image generation & editing
-              </p>
+              {/* Eyebrow Badge — Secondary font, consistent brand pill */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-black/[0.04] border border-black/[0.06] text-neutral-600 text-[12px] font-medium tracking-[0.06em] uppercase mb-5 font-sans">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                <span>AI image generation & editing</span>
+              </div>
 
-              {/* Headline — Instrument Serif, sentence case, 2 lines max */}
+              {/* Headline — Primary Font (Poppins), bold, clean tracking */}
               <h1
                 style={{
-                  fontFamily: "'Instrument Serif', Georgia, serif",
-                  fontSize: 'clamp(2.75rem, 6vw, 5rem)',
-                  lineHeight: 1.05,
-                  letterSpacing: '-0.02em',
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: 'clamp(2.4rem, 4.8vw, 4.25rem)',
+                  lineHeight: 1.08,
+                  letterSpacing: '-0.025em',
+                  fontWeight: 700,
                 }}
-                className="text-ink font-normal max-w-[520px]"
+                className="text-ink max-w-[540px] font-primary"
               >
                 Turn your words{' '}
                 <br className="hidden sm:inline" />
-                into <em className="italic">any image</em>
+                into <span className="text-primary font-bold">any image</span>
               </h1>
 
-              {/* Body — 18px, regular weight, 1.55 line-height */}
+              {/* Body — Secondary Font (Plus Jakarta Sans) */}
               <p
-                className="text-[18px] font-normal leading-[1.55] text-neutral-600 mt-6 max-w-[500px]"
+                className="font-sans text-[16px] sm:text-[17px] font-normal leading-[1.6] text-neutral-600 mt-5 max-w-[500px]"
               >
                 Generate, enhance, remove backgrounds, and upscale — all from one studio. No prompt engineering needed.
               </p>
 
-              {/* Scroll hint */}
-              <div className="mt-10 flex items-center gap-2.5 text-[13px] text-neutral-400">
+              {/* Scroll hint — Secondary font */}
+              <div className="mt-9 flex items-center gap-2.5 text-[13px] font-medium text-neutral-400 font-sans">
                 <div className="w-4 h-7 rounded-full border border-neutral-300 flex items-start justify-center p-0.5">
                   <div className="w-1 h-1.5 bg-neutral-400 rounded-full animate-bounce" />
                 </div>
@@ -200,47 +200,47 @@ const VideoHero = () => {
               }}
               className="absolute inset-x-0 transition-opacity duration-75"
             >
-              {/* Eyebrow */}
-              <p
-                className="text-[13px] font-medium tracking-[0.08em] uppercase text-neutral-500 mb-4"
-              >
-                Text to image, enhance & edit
-              </p>
+              {/* Eyebrow Badge */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-black/[0.04] border border-black/[0.06] text-neutral-600 text-[12px] font-medium tracking-[0.06em] uppercase mb-5 font-sans">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                <span>Text to image, enhance & edit</span>
+              </div>
 
-              {/* Headline */}
+              {/* Headline — Primary Font (Poppins) */}
               <h2
                 style={{
-                  fontFamily: "'Instrument Serif', Georgia, serif",
-                  fontSize: 'clamp(2.75rem, 6vw, 5rem)',
-                  lineHeight: 1.05,
-                  letterSpacing: '-0.02em',
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: 'clamp(2.4rem, 4.8vw, 4.25rem)',
+                  lineHeight: 1.08,
+                  letterSpacing: '-0.025em',
+                  fontWeight: 700,
                 }}
-                className="text-ink font-normal max-w-[520px]"
+                className="text-ink max-w-[540px] font-primary"
               >
                 Create without{' '}
                 <br className="hidden sm:inline" />
-                the <em className="italic">complexity</em>
+                the <span className="text-primary font-bold">complexity</span>
               </h2>
 
-              {/* Body */}
+              {/* Body — Secondary Font */}
               <p
-                className="text-[18px] font-normal leading-[1.55] text-neutral-600 mt-6 max-w-[500px]"
+                className="font-sans text-[16px] sm:text-[17px] font-normal leading-[1.6] text-neutral-600 mt-5 max-w-[500px]"
               >
                 4K generation, background removal, and photo repair in one place. Free credits to start, no card required.
               </p>
 
-              {/* Buttons + microcopy */}
+              {/* Buttons + microcopy — Theme aligned */}
               <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
                 <button
                   type="button"
                   onClick={handleGetStarted}
-                  className="inline-flex items-center gap-2 px-7 py-3 rounded-full bg-primary hover:bg-primary-focus text-white font-medium text-[15px] shadow-sm hover:shadow-md active:scale-[0.97] transition-all duration-200 cursor-pointer"
+                  className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-primary hover:bg-primary-focus text-white font-semibold text-[15px] shadow-[0_2px_12px_rgba(0,102,204,0.25)] hover:shadow-[0_4px_20px_rgba(0,102,204,0.35)] active:scale-[0.98] transition-all duration-200 cursor-pointer font-primary"
                 >
                   Launch studio
                   <ArrowRight className="w-4 h-4" />
                 </button>
 
-                <p className="text-[13px] text-neutral-500">
+                <p className="font-sans text-[13px] text-neutral-500">
                   Free credits included. No card required.
                 </p>
               </div>

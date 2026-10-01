@@ -23,11 +23,11 @@ export default {
         },
       },
       fontFamily: {
+        primary: ['"Poppins"', 'sans-serif'],
+        secondary: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+        poppins: ['"Poppins"', 'sans-serif'],
         sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
-        display: ['"Clash Display"', '"Cabinet Grotesk"', '"Syne"', 'sans-serif'],
-        grotesk: ['"Cabinet Grotesk"', '"Space Grotesk"', 'sans-serif'],
-        mono: ['"Space Grotesk"', 'monospace'],
-        poppins: ['"Plus Jakarta Sans"', 'sans-serif'], // fallback redirect
+        display: ['"Poppins"', 'sans-serif'],
       },
     },
   },
