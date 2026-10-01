@@ -8,7 +8,11 @@ import Result from './pages/Result'
 import BuyCredit from './pages/BuyCredit'
 import RemoveBg from './pages/RemoveBg'
 import Enhance from './pages/Enhance'
+import Unblur from './pages/Unblur'
+import AiEditor from './pages/AiEditor'
+import GenFill from './pages/GenFill'
 import Usage from './pages/Usage'
+import History from './pages/History'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Login from './components/Login'
@@ -17,8 +21,7 @@ import { AppContext } from './context/AppContext'
 const App = () => {
   const { showLogin } = useContext(AppContext)
   const location = useLocation()
-  // Dedicated tools & pricing studio pages remain clean and clutter-free without the directory footer
-  const hideFooterRoutes = ['/result', '/remove-bg', '/enhance', '/buycredit', '/usage']
+  const hideFooterRoutes = ['/result', '/remove-bg', '/enhance', '/unblur', '/ai-editor', '/gen-fill', '/buycredit', '/usage', '/history']
   const showFooter = !hideFooterRoutes.includes(location.pathname)
 
   return (
@@ -39,6 +42,10 @@ const App = () => {
           <Route path='/usage' element={<Usage />} />
           <Route path='/remove-bg' element={<RemoveBg />} />
           <Route path='/enhance' element={<Enhance />} />
+          <Route path='/unblur' element={<Unblur />} />
+          <Route path='/ai-editor' element={<AiEditor />} />
+          <Route path='/gen-fill' element={<GenFill />} />
+          <Route path='/history' element={<History />} />
         </Routes>
       </main>
       {showFooter && <Footer />}

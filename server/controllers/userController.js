@@ -1,3 +1,4 @@
+﻿import cloudinary from '../config/cloudinary.js';
 import userModel from "../models/userModel.js";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
@@ -172,4 +173,105 @@ const verifyRazorpay = async (req, res)=>{
     }
 }
 
-export {registerUser, loginUser, userCredits, paymentRazorpay, verifyRazorpay}
+
+const getUserUsage = async (req, res) => {
+    try {
+        const { userId } = req.body;
+        const user = await userModel.findById(userId);
+
+        if (!user) {
+            return res.json({ success: false, message: 'User not found' });
+        }
+
+        let logs = user.usageLogs;
+        const currentTotal = logs?.totalUsed || (
+            (logs?.textToImage || 0) +
+            (logs?.removeBg    || 0) +
+            (logs?.enhance     || 0) +
+            (logs?.aiEditor    || 0) +
+            (logs?.genFill     || 0) +
+            (logs?.unblur      || 0)
+        );
+
+        // Auto-sync once from Cloudinary if usageLogs has 0 / not initialized
+        if (!currentTotal || currentTotal === 0) {
+            try {
+                const cldRes = await cloudinary.search
+                    .expression(`public_id:imagify/* AND tags=${userId}`)
+                    .max_results(500)
+                    .execute();
+
+                const resources = cldRes.resources || [];
+                if (resources.length > 0) {
+                    let textToImage = 0;
+                    let removeBg = 0;
+                    let enhance = 0;
+                    let aiEditor = 0;
+                    let genFill = 0;
+                    let unblur = 0;
+
+                    resources.forEach((r) => {
+                        const pid = r.public_id || '';
+                        if (pid.startsWith('imagify/generated')) textToImage++;
+                        else if (pid.startsWith('imagify/bg-removal')) removeBg++;
+                        else if (pid.startsWith('imagify/enhance')) enhance++;
+                        else if (pid.startsWith('imagify/gen-replace') || pid.startsWith('imagify/gen-recolor')) aiEditor++;
+                        else if (pid.startsWith('imagify/gen-fill')) genFill++;
+                        else if (pid.startsWith('imagify/unblur')) unblur++;
+                    });
+
+                    const totalUsed = textToImage + removeBg + enhance + aiEditor + genFill + unblur;
+
+                    logs = {
+                        textToImage,
+                        removeBg,
+                        enhance,
+                        aiEditor,
+                        genFill,
+                        unblur,
+                        totalUsed,
+                    };
+
+                    await userModel.findByIdAndUpdate(userId, { usageLogs: logs });
+                }
+            } catch (cldErr) {
+                console.log('Cloudinary auto-sync error in getUserUsage:', cldErr.message);
+            }
+        }
+
+        const textToImage = logs?.textToImage || 0;
+        const removeBg    = logs?.removeBg    || 0;
+        const enhance     = logs?.enhance     || 0;
+        const aiEditor    = logs?.aiEditor    || 0;
+        const genFill     = logs?.genFill     || 0;
+        const unblur      = logs?.unblur      || 0;
+        const totalUsed   = logs?.totalUsed ?? (textToImage + removeBg + enhance + aiEditor + genFill + unblur);
+
+        const creditsLeft  = user.creditBalance;
+        const creditsUsed  = totalUsed;
+        const totalCredits = creditsLeft + creditsUsed;
+
+        res.json({
+            success: true,
+            data: {
+                creditsLeft,
+                creditsUsed,
+                totalCredits,
+                features: {
+                    textToImage,
+                    removeBg,
+                    enhance,
+                    aiEditor,
+                    genFill,
+                    unblur,
+                },
+            },
+        });
+    } catch (error) {
+        console.log('Usage Error:', error.message);
+        res.json({ success: false, message: error.message });
+    }
+}
+export {registerUser, loginUser, userCredits, paymentRazorpay, verifyRazorpay, getUserUsage}
+
+

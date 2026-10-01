@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useRef, useCallback } from 'react'
+﻿import React, { useContext, useEffect, useState, useRef, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import axios from 'axios'
@@ -7,31 +7,21 @@ import {
   Image as ImageIcon,
   Scissors,
   Sparkles,
-  Plus,
   CreditCard,
   ArrowRight,
-  TrendingUp,
   Zap,
+  PenTool,
+  Expand,
+  Focus,
 } from 'lucide-react'
 
-// ─── Flip to true to require sign-in before showing stats ────────────────────
 const REQUIRE_AUTH = false
 
-// ─── Swappable Feature 4 Placeholder Config ──────────────────────────────────
-// Edit this object when adding a new 4th feature later.
-const PLACEHOLDER_FEATURE_4 = {
-  name: 'Coming Soon',
-  description: 'Next AI model engine',
-  statDisplay: '—',
-  badge: 'In Development',
-}
-
-// Demo data shown when auth is bypassed or there's no live data
 const DEMO_STATS = {
   creditsLeft: 3,
-  creditsUsed: 2,
-  totalCredits: 5,
-  features: { textToImage: 1, removeBg: 1, enhance: 0 },
+  creditsUsed: 3,
+  totalCredits: 6,
+  features: { textToImage: 1, removeBg: 1, enhance: 1, aiEditor: 0, genFill: 0, unblur: 0 },
   history: [],
 }
 
@@ -45,7 +35,7 @@ const GrainOverlay = () => (
   />
 )
 
-// Glowing Orb Component for Feature & Credit Icons matching BuyCredit.jsx style
+// Glowing Orb Component matching BuyCredit.jsx style
 const ThemeOrb = ({ theme, icon: Icon }) => {
   const configs = {
     blue: {
@@ -64,9 +54,17 @@ const ThemeOrb = ({ theme, icon: Icon }) => {
       gradient: 'radial-gradient(circle at 35% 30%, #a5b4fc 0%, #6366f1 55%, #4338ca 100%)',
       shadow: '0 8px 18px -2px rgba(99,102,241,0.40)',
     },
-    slate: {
-      gradient: 'radial-gradient(circle at 35% 30%, #e2e8f0 0%, #94a3b8 55%, #64748b 100%)',
-      shadow: '0 6px 14px -2px rgba(100,116,139,0.25)',
+    violet: {
+      gradient: 'radial-gradient(circle at 35% 30%, #f0abfc 0%, #a855f7 55%, #7e22ce 100%)',
+      shadow: '0 8px 18px -2px rgba(168,85,247,0.40)',
+    },
+    emerald: {
+      gradient: 'radial-gradient(circle at 35% 30%, #6ee7b7 0%, #10b981 55%, #065f46 100%)',
+      shadow: '0 8px 18px -2px rgba(16,185,129,0.40)',
+    },
+    sky: {
+      gradient: 'radial-gradient(circle at 35% 30%, #38bdf8 0%, #0284c7 55%, #0369a1 100%)',
+      shadow: '0 8px 18px -2px rgba(2,132,199,0.45)',
     },
   }
 
@@ -80,9 +78,7 @@ const ThemeOrb = ({ theme, icon: Icon }) => {
         boxShadow: conf.shadow,
       }}
     >
-      {/* Specular highlight */}
       <div className='absolute top-1.5 left-2 w-3.5 h-2 rounded-full bg-white/45 blur-[0.5px] -rotate-45 pointer-events-none' />
-      {/* Centered icon */}
       <Icon className='w-5 h-5 text-white z-10 stroke-[2]' />
     </div>
   )
@@ -103,13 +99,15 @@ const Usage = () => {
       textToImage: 0,
       removeBg: 0,
       enhance: 0,
+      aiEditor: 0,
+      genFill: 0,
+      unblur: 0,
     },
     history: [],
   })
 
   const pollingTimerRef = useRef(null)
 
-  // ─── Fetch Usage Data ────────────────────────────────────────────────────────
   const fetchUsageData = useCallback(
     async (isBackground = false) => {
       if (!token) {
@@ -155,7 +153,6 @@ const Usage = () => {
     [token, backendUrl, setCredit]
   )
 
-  // ─── Real-Time Live Polling (every 5 seconds) ─────────────────────────────────
   useEffect(() => {
     fetchUsageData(false)
 
@@ -183,16 +180,126 @@ const Usage = () => {
     }
   }, [fetchUsageData, token])
 
-  // Progress calculations
   const total = Math.max(stats.totalCredits, 1)
   const usedPercent = Math.min(100, Math.round((stats.creditsUsed / total) * 100))
-  const remainingPercent = Math.max(0, 100 - usedPercent)
+
+  // Feature cards config — easy to extend when more features are added
+  const FEATURE_CARDS = [
+    {
+      key: 'textToImage',
+      label: 'Text-to-Image',
+      desc: 'High-resolution visual synthesis from prompts.',
+      unit: 'generations',
+      theme: 'blue',
+      icon: ImageIcon,
+      badgeText: '1 Credit / Run',
+      badgeClass: 'bg-blue-500/10 border-blue-200/80 text-blue-700',
+      dividerClass: 'border-blue-200/60',
+      linkTo: '/result',
+      linkLabel: 'Generate',
+      linkClass: 'hover:bg-blue-50 text-blue-700 border-blue-200',
+      engineLabel: 'Standard Engine',
+      gradientBg: 'linear-gradient(180deg, #dbeafe 0%, #eff6ff 45%, #ffffff 100%)',
+      gradientBorder: '#bfdbfe',
+      statColor: 'text-blue-600',
+    },
+    {
+      key: 'removeBg',
+      label: 'Remove Background',
+      desc: 'Instant subject isolation with HD PNG transparency.',
+      unit: 'cutouts',
+      theme: 'purple',
+      icon: Scissors,
+      badgeText: '1 Credit / Run',
+      badgeClass: 'bg-purple-500/10 border-purple-200/80 text-purple-700',
+      dividerClass: 'border-purple-200/60',
+      linkTo: '/remove-bg',
+      linkLabel: 'Erase BG',
+      linkClass: 'hover:bg-purple-50 text-purple-700 border-purple-200',
+      engineLabel: 'Precision Cutter',
+      gradientBg: 'linear-gradient(180deg, #ede9fe 0%, #f5f3ff 45%, #ffffff 100%)',
+      gradientBorder: '#ddd6fe',
+      statColor: 'text-purple-600',
+    },
+    {
+      key: 'enhance',
+      label: 'Photo Enhancer',
+      desc: 'AI detail upscaling & facial recovery.',
+      unit: 'enhanced',
+      theme: 'gold',
+      icon: Sparkles,
+      badgeText: '1 Credit / Run',
+      badgeClass: 'bg-amber-500/10 border-amber-300/80 text-amber-800',
+      dividerClass: 'border-amber-200/80',
+      linkTo: '/enhance',
+      linkLabel: 'Enhance',
+      linkClass: 'hover:bg-amber-50 text-amber-800 border-amber-200',
+      engineLabel: 'Super-Resolution',
+      gradientBg: 'linear-gradient(180deg, #fef3c7 0%, #fffbeb 45%, #ffffff 100%)',
+      gradientBorder: '#fde68a',
+      statColor: 'text-amber-700',
+    },
+    {
+      key: 'aiEditor',
+      label: 'AI Editor',
+      desc: 'Generative replace & recolor with text prompts.',
+      unit: 'edits',
+      theme: 'violet',
+      icon: PenTool,
+      badgeText: '1 Credit / Run',
+      badgeClass: 'bg-purple-500/10 border-purple-300/80 text-purple-800',
+      dividerClass: 'border-purple-200/60',
+      linkTo: '/ai-editor',
+      linkLabel: 'Edit',
+      linkClass: 'hover:bg-purple-50 text-purple-800 border-purple-200',
+      engineLabel: 'Gen Replace · Recolor',
+      gradientBg: 'linear-gradient(180deg, #f3e8ff 0%, #faf5ff 45%, #ffffff 100%)',
+      gradientBorder: '#e9d5ff',
+      statColor: 'text-purple-700',
+    },
+    {
+      key: 'genFill',
+      label: 'Generative Fill',
+      desc: 'Outpaint & expand images to any aspect ratio.',
+      unit: 'fills',
+      theme: 'emerald',
+      icon: Expand,
+      badgeText: '1 Credit / Run',
+      badgeClass: 'bg-emerald-500/10 border-emerald-300/80 text-emerald-800',
+      dividerClass: 'border-emerald-200/60',
+      linkTo: '/gen-fill',
+      linkLabel: 'Expand',
+      linkClass: 'hover:bg-emerald-50 text-emerald-800 border-emerald-200',
+      engineLabel: 'Gen Fill · Outpaint',
+      gradientBg: 'linear-gradient(180deg, #d1fae5 0%, #f0fdf4 45%, #ffffff 100%)',
+      gradientBorder: '#a7f3d0',
+      statColor: 'text-emerald-700',
+    },
+    {
+      key: 'unblur',
+      label: 'AI Unblur',
+      desc: 'Eliminate blur & restore crisp edge clarity.',
+      unit: 'restored',
+      theme: 'sky',
+      icon: Focus,
+      badgeText: '1 Credit / Run',
+      badgeClass: 'bg-sky-500/10 border-sky-300/80 text-sky-800',
+      dividerClass: 'border-sky-200/60',
+      linkTo: '/unblur',
+      linkLabel: 'Unblur',
+      linkClass: 'hover:bg-sky-50 text-sky-800 border-sky-200',
+      engineLabel: 'Neural Deblur',
+      gradientBg: 'linear-gradient(180deg, #e0f2fe 0%, #f0f9ff 45%, #ffffff 100%)',
+      gradientBorder: '#bae6fd',
+      statColor: 'text-sky-700',
+    },
+  ]
 
   return (
     <div className='w-full min-h-screen lg:h-screen lg:max-h-screen lg:overflow-hidden bg-[#fafafc] pt-20 sm:pt-22 pb-4 select-none flex flex-col justify-center'>
-      <div className='max-w-[1140px] mx-auto px-4 sm:px-6 w-full'>
+      <div className='max-w-[1180px] mx-auto px-4 sm:px-6 w-full'>
 
-        {/* ── Page Header Stack ── */}
+        {/* Page Header */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -207,7 +314,7 @@ const Usage = () => {
           </p>
         </motion.div>
 
-        {/* ── Error State ── */}
+        {/* Error State */}
         {error && (
           <div className='mb-3 px-4 py-2.5 rounded-[16px] bg-red-50 border border-red-200 text-[13px] text-red-900 flex items-center justify-between shadow-2xs'>
             <div className='flex items-center gap-2'>
@@ -223,8 +330,8 @@ const Usage = () => {
           </div>
         )}
 
-        {/* ── Unauthenticated State (when REQUIRE_AUTH is true) ── */}
-        {REQUIRE_AUTH && !user && !loading && (
+        {/* Sign-in Gate */}
+        {!showGrid && (
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
@@ -249,11 +356,11 @@ const Usage = () => {
           </motion.div>
         )}
 
-        {/* ── Loading Skeleton ── */}
+        {/* Loading Skeleton */}
         {loading && showGrid && (
           <div className='grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5 items-stretch mb-0'>
-            <div className='md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4'>
-              {[...Array(4)].map((_, i) => (
+            <div className='md:col-span-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+              {[...Array(6)].map((_, i) => (
                 <div
                   key={i}
                   className='bg-white rounded-[22px] border border-[#e5e5e7] p-2 shadow-2xs animate-pulse h-[180px]'
@@ -268,224 +375,69 @@ const Usage = () => {
           </div>
         )}
 
-        {/* ── 5-Box Stats Grid ── */}
+        {/* ──── Main Stats Grid ──── */}
         {!loading && showGrid && (
           <div className='grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5 items-stretch mb-0'>
 
-            {/* Left 2 Columns containing Box 1, 2, 3, 4 */}
-            <div className='md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4'>
-
-              {/* ── BOX 1: Text-to-Image (Blue Theme) ── */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.05 }}
-                className='bg-white rounded-[22px] border border-[#e5e5e7] p-2 flex flex-col justify-between shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] transition-all duration-300'
-              >
-                <div
-                  className='rounded-[16px] p-3.5 sm:p-4 relative overflow-hidden border flex flex-col justify-between h-full'
-                  style={{
-                    background: 'linear-gradient(180deg, #dbeafe 0%, #eff6ff 45%, #ffffff 100%)',
-                    borderColor: '#bfdbfe',
-                  }}
+            {/* Left: 6 Feature Cards (3-col on large, 2-col on medium, 1-col on mobile) */}
+            <div className='md:col-span-2 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4 content-start'>
+              {FEATURE_CARDS.map((card, index) => (
+                <motion.div
+                  key={card.key}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.05 + index * 0.05 }}
+                  className='bg-white rounded-[22px] border border-[#e5e5e7] p-2 flex flex-col justify-between shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] transition-all duration-300'
                 >
-                  <GrainOverlay />
+                  <div
+                    className='rounded-[16px] p-3.5 relative overflow-hidden border flex flex-col justify-between h-full'
+                    style={{
+                      background: card.gradientBg,
+                      borderColor: card.gradientBorder,
+                    }}
+                  >
+                    <GrainOverlay />
 
-                  {/* Header Row */}
-                  <div className='flex items-center justify-between relative z-10'>
-                    <ThemeOrb theme='blue' icon={ImageIcon} />
-                    <span className='px-2.5 py-0.5 rounded-full bg-blue-500/10 border border-blue-200/80 text-[11px] font-semibold text-blue-700 backdrop-blur-sm'>
-                      1 Credit / Gen
-                    </span>
-                  </div>
-
-                  {/* Title & Count */}
-                  <div className='mt-3 relative z-10'>
-                    <div className='flex items-baseline gap-1.5'>
-                      <span className='text-[34px] font-bold text-ink tracking-tight leading-none'>
-                        {stats.features.textToImage}
+                    {/* Header Row */}
+                    <div className='flex items-center justify-between relative z-10'>
+                      <ThemeOrb theme={card.theme} icon={card.icon} />
+                      <span className={`px-2 py-0.5 rounded-full border text-[10px] font-semibold backdrop-blur-sm ${card.badgeClass}`}>
+                        {card.badgeText}
                       </span>
-                      <span className='text-[12px] font-medium text-blue-600'>generations</span>
                     </div>
-                    <h3 className='text-[17px] font-bold text-ink tracking-tight mt-1.5'>
-                      Text-to-Image
-                    </h3>
-                    <p className='text-[12px] text-[#4b5563] mt-0.5 leading-snug line-clamp-1'>
-                      High-resolution visual synthesis from prompts.
-                    </p>
-                  </div>
 
-                  {/* Action Button */}
-                  <div className='mt-3 relative z-10 pt-2.5 border-t border-blue-200/60 flex items-center justify-between'>
-                    <span className='text-[11px] text-[#6b7280]'>Standard Engine</span>
-                    <Link
-                      to='/result'
-                      className='inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white hover:bg-blue-50 text-blue-700 border border-blue-200 shadow-2xs text-[12px] font-semibold transition-all active:scale-95'
-                    >
-                      Generate <ArrowRight className='w-3 h-3' />
-                    </Link>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* ── BOX 2: Remove BG (Purple Theme) ── */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.1 }}
-                className='bg-white rounded-[22px] border border-[#e5e5e7] p-2 flex flex-col justify-between shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] transition-all duration-300'
-              >
-                <div
-                  className='rounded-[16px] p-3.5 sm:p-4 relative overflow-hidden border flex flex-col justify-between h-full'
-                  style={{
-                    background: 'linear-gradient(180deg, #ede9fe 0%, #f5f3ff 45%, #ffffff 100%)',
-                    borderColor: '#ddd6fe',
-                  }}
-                >
-                  <GrainOverlay />
-
-                  {/* Header Row */}
-                  <div className='flex items-center justify-between relative z-10'>
-                    <ThemeOrb theme='purple' icon={Scissors} />
-                    <span className='px-2.5 py-0.5 rounded-full bg-purple-500/10 border border-purple-200/80 text-[11px] font-semibold text-purple-700 backdrop-blur-sm'>
-                      1 Credit / Run
-                    </span>
-                  </div>
-
-                  {/* Title & Count */}
-                  <div className='mt-3 relative z-10'>
-                    <div className='flex items-baseline gap-1.5'>
-                      <span className='text-[34px] font-bold text-ink tracking-tight leading-none'>
-                        {stats.features.removeBg}
-                      </span>
-                      <span className='text-[12px] font-medium text-purple-600'>cutouts</span>
+                    {/* Title & Count */}
+                    <div className='mt-3 relative z-10'>
+                      <div className='flex items-baseline gap-1.5'>
+                        <span className='text-[28px] font-bold text-ink tracking-tight leading-none'>
+                          {stats.features[card.key] ?? 0}
+                        </span>
+                        <span className={`text-[11px] font-medium ${card.statColor}`}>{card.unit}</span>
+                      </div>
+                      <h3 className='text-[14px] font-bold text-ink tracking-tight mt-1 leading-tight'>
+                        {card.label}
+                      </h3>
+                      <p className='text-[11px] text-[#4b5563] mt-0.5 leading-snug line-clamp-2'>
+                        {card.desc}
+                      </p>
                     </div>
-                    <h3 className='text-[17px] font-bold text-ink tracking-tight mt-1.5'>
-                      Remove Background
-                    </h3>
-                    <p className='text-[12px] text-[#4b5563] mt-0.5 leading-snug line-clamp-1'>
-                      Instant subject isolation with HD PNG transparency.
-                    </p>
-                  </div>
 
-                  {/* Action Button */}
-                  <div className='mt-3 relative z-10 pt-2.5 border-t border-purple-200/60 flex items-center justify-between'>
-                    <span className='text-[11px] text-[#6b7280]'>Precision Cutter</span>
-                    <Link
-                      to='/remove-bg'
-                      className='inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white hover:bg-purple-50 text-purple-700 border border-purple-200 shadow-2xs text-[12px] font-semibold transition-all active:scale-95'
-                    >
-                      Erase BG <ArrowRight className='w-3 h-3' />
-                    </Link>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* ── BOX 3: Enhance (Gold Theme) ── */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.15 }}
-                className='bg-white rounded-[22px] border border-[#e5e5e7] p-2 flex flex-col justify-between shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] transition-all duration-300'
-              >
-                <div
-                  className='rounded-[16px] p-3.5 sm:p-4 relative overflow-hidden border flex flex-col justify-between h-full'
-                  style={{
-                    background: 'linear-gradient(180deg, #fef3c7 0%, #fffbeb 45%, #ffffff 100%)',
-                    borderColor: '#fde68a',
-                  }}
-                >
-                  <GrainOverlay />
-
-                  {/* Header Row */}
-                  <div className='flex items-center justify-between relative z-10'>
-                    <ThemeOrb theme='gold' icon={Sparkles} />
-                    <span className='px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-300/80 text-[11px] font-semibold text-amber-800 backdrop-blur-sm'>
-                      1 Credit / Run
-                    </span>
-                  </div>
-
-                  {/* Title & Count */}
-                  <div className='mt-3 relative z-10'>
-                    <div className='flex items-baseline gap-1.5'>
-                      <span className='text-[34px] font-bold text-ink tracking-tight leading-none'>
-                        {stats.features.enhance}
-                      </span>
-                      <span className='text-[12px] font-medium text-amber-700'>enhanced</span>
+                    {/* Action Row */}
+                    <div className={`mt-3 relative z-10 pt-2.5 border-t flex items-center justify-between ${card.dividerClass}`}>
+                      <span className='text-[10px] text-[#6b7280]'>{card.engineLabel}</span>
+                      <Link
+                        to={card.linkTo}
+                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white border shadow-2xs text-[11px] font-semibold transition-all active:scale-95 ${card.linkClass}`}
+                      >
+                        {card.linkLabel} <ArrowRight className='w-2.5 h-2.5' />
+                      </Link>
                     </div>
-                    <h3 className='text-[17px] font-bold text-ink tracking-tight mt-1.5'>
-                      Photo Enhancer
-                    </h3>
-                    <p className='text-[12px] text-[#4b5563] mt-0.5 leading-snug line-clamp-1'>
-                      AI detail upscaling & facial recovery.
-                    </p>
                   </div>
-
-                  {/* Action Button */}
-                  <div className='mt-3 relative z-10 pt-2.5 border-t border-amber-200/80 flex items-center justify-between'>
-                    <span className='text-[11px] text-[#6b7280]'>Super-Resolution</span>
-                    <Link
-                      to='/enhance'
-                      className='inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white hover:bg-amber-50 text-amber-800 border border-amber-200 shadow-2xs text-[12px] font-semibold transition-all active:scale-95'
-                    >
-                      Enhance <ArrowRight className='w-3 h-3' />
-                    </Link>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* ── BOX 4: Placeholder / Coming Soon (Cool Slate Theme) ── */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.2 }}
-                className='bg-white rounded-[22px] border border-[#e5e5e7] p-2 flex flex-col justify-between shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] transition-all duration-300'
-              >
-                <div
-                  className='rounded-[16px] p-3.5 sm:p-4 relative overflow-hidden border border-dashed flex flex-col justify-between h-full'
-                  style={{
-                    background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 45%, #ffffff 100%)',
-                    borderColor: '#cbd5e1',
-                  }}
-                >
-                  <GrainOverlay />
-
-                  {/* Header Row */}
-                  <div className='flex items-center justify-between relative z-10'>
-                    <ThemeOrb theme='slate' icon={Plus} />
-                    <span className='px-2.5 py-0.5 rounded-full bg-slate-200/80 border border-slate-300 text-[11px] font-semibold text-slate-700 backdrop-blur-sm'>
-                      {PLACEHOLDER_FEATURE_4.badge}
-                    </span>
-                  </div>
-
-                  {/* Title & Count */}
-                  <div className='mt-3 relative z-10'>
-                    <div className='flex items-baseline gap-1.5'>
-                      <span className='text-[34px] font-bold text-slate-400 tracking-tight leading-none'>
-                        {PLACEHOLDER_FEATURE_4.statDisplay}
-                      </span>
-                      <span className='text-[12px] font-medium text-slate-500'>upcoming</span>
-                    </div>
-                    <h3 className='text-[17px] font-bold text-ink tracking-tight mt-1.5'>
-                      {PLACEHOLDER_FEATURE_4.name}
-                    </h3>
-                    <p className='text-[12px] text-[#64748b] mt-0.5 leading-snug line-clamp-1'>
-                      {PLACEHOLDER_FEATURE_4.description}
-                    </p>
-                  </div>
-
-                  {/* Action Info */}
-                  <div className='mt-3 relative z-10 pt-2.5 border-t border-slate-200 flex items-center justify-between'>
-                    <span className='text-[11px] text-slate-500'>Reserved Slot</span>
-                    <span className='text-[11px] font-medium text-slate-500 px-2.5 py-0.5 rounded-full bg-white/80 border border-slate-200'>
-                      Stay tuned
-                    </span>
-                  </div>
-                </div>
-              </motion.div>
+                </motion.div>
+              ))}
             </div>
 
-            {/* ── BOX 5: Big Real-Time Credits Analytics Box (Indigo/Violet Accent) ── */}
+            {/* Right: Credits Analytics Box (Indigo/Violet Accent) */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -527,7 +479,7 @@ const Usage = () => {
                     </p>
                   </div>
 
-                  {/* Progress Bar with Color Gradient */}
+                  {/* Progress Bar */}
                   <div className='mt-3 relative z-10 bg-white/70 backdrop-blur-xs p-3 rounded-[14px] border border-indigo-100 shadow-2xs'>
                     <div className='flex items-center justify-between text-[12px] mb-1.5 font-medium'>
                       <span className='text-ink font-semibold'>Allocation</span>
@@ -547,7 +499,7 @@ const Usage = () => {
                     </div>
                   </div>
 
-                  {/* Breakdown Table Rows */}
+                  {/* Breakdown Table */}
                   <div className='mt-3 relative z-10 space-y-1.5'>
                     <div className='flex items-center justify-between p-2 rounded-[12px] bg-white/60 border border-slate-200/70 text-[12px]'>
                       <div className='flex items-center gap-1.5 text-[#4b5563]'>
@@ -575,7 +527,7 @@ const Usage = () => {
                   </div>
                 </div>
 
-                {/* Primary CTA Button */}
+                {/* CTA Button */}
                 <div className='mt-4 relative z-10'>
                   <Link
                     to='/buycredit'

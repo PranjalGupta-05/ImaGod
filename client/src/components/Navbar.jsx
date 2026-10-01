@@ -4,19 +4,14 @@ import { motion } from 'framer-motion'
 import { AppContext } from '../context/AppContext'
 import { assets } from '../assets/assets'
 
-// 5 Navigation items with the user-requested Remove BG icon and uniform 17px dimensions
+// Navigation items � includes all Cloudinary AI tools
 const NAV_ITEMS = [
   {
     path: '/',
     label: 'Overview',
     icon: (
       <svg className='w-[17px] h-[17px]' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-        <path
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          strokeWidth={1.8}
-          d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'
-        />
+        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.8} d='M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' />
       </svg>
     ),
   },
@@ -25,56 +20,19 @@ const NAV_ITEMS = [
     label: 'Text to Image',
     icon: (
       <svg className='w-[17px] h-[17px]' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-        <path
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          strokeWidth={1.8}
-          d='M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2zM15 4l1.5 1.5M19.5 8.5L21 10m-6 0l6-6'
-        />
+        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.8} d='M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z' />
       </svg>
     ),
   },
   {
     path: '/remove-bg',
     label: 'Remove BG',
-    // Given Eraser + Sparkles icon from user attachment
     icon: (
       <svg className='w-[17px] h-[17px]' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-        {/* Angled Eraser Contour */}
-        <path
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          strokeWidth={1.8}
-          d='M18 10L14 6a2 2 0 00-2.8 0L3.5 13.7a2 2 0 000 2.8l3.5 3.5a2 2 0 002.8 0L18 11.8a1.3 1.3 0 000-1.8z'
-        />
-        {/* Diagonal Eraser Cut */}
-        <path
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          strokeWidth={1.8}
-          d='M3.8 14.5l5.2 5.2'
-        />
-        {/* Inner Slit */}
-        <path
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          strokeWidth={1.8}
-          d='M8 10l3.5 3.5'
-        />
-        {/* Sparkle Top-Right */}
-        <path
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          strokeWidth={1.8}
-          d='M20 2v3m-1.5-1.5h3'
-        />
-        {/* Sparkle Bottom-Right */}
-        <path
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          strokeWidth={1.8}
-          d='M17 17v3m-1.5-1.5h3'
-        />
+        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.8} d='M18 10L14 6a2 2 0 00-2.8 0L3.5 13.7a2 2 0 000 2.8l3.5 3.5a2 2 0 002.8 0L18 11.8a1.3 1.3 0 000-1.8z' />
+        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.8} d='M3.8 14.5l5.2 5.2' />
+        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.8} d='M20 2v3m-1.5-1.5h3' />
+        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.8} d='M17 17v3m-1.5-1.5h3' />
       </svg>
     ),
   },
@@ -83,12 +41,44 @@ const NAV_ITEMS = [
     label: 'Enhance',
     icon: (
       <svg className='w-[17px] h-[17px]' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-        <path
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          strokeWidth={1.8}
-          d='M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.286L13 21l-2.286-6.857L5 12l5.714-2.286L13 3z'
-        />
+        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.8} d='M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.286L13 21l-2.286-6.857L5 12l5.714-2.286L13 3z' />
+      </svg>
+    ),
+  },
+  {
+    path: '/unblur',
+    label: 'AI Unblur',
+    icon: (
+      <svg className='w-[17px] h-[17px]' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+        <circle cx='12' cy='12' r='3.5' strokeWidth={1.8} />
+        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.8} d='M3 9V5a2 2 0 012-2h4m10 0h4a2 2 0 012 2v4m0 10v4a2 2 0 01-2 2h-4m-10 0H5a2 2 0 01-2-2v-4' />
+      </svg>
+    ),
+  },
+  {
+    path: '/ai-editor',
+    label: 'AI Editor',
+    icon: (
+      <svg className='w-[17px] h-[17px]' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.8} d='M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z' />
+      </svg>
+    ),
+  },
+  {
+    path: '/gen-fill',
+    label: 'Gen Fill',
+    icon: (
+      <svg className='w-[17px] h-[17px]' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.8} d='M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4' />
+      </svg>
+    ),
+  },
+  {
+    path: '/history',
+    label: 'History',
+    icon: (
+      <svg className='w-[17px] h-[17px]' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.8} d='M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' />
       </svg>
     ),
   },
@@ -97,12 +87,7 @@ const NAV_ITEMS = [
     label: 'Usage',
     icon: (
       <svg className='w-[17px] h-[17px]' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-        <path
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          strokeWidth={1.8}
-          d='M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'
-        />
+        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.8} d='M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' />
       </svg>
     ),
   },
@@ -111,17 +96,11 @@ const NAV_ITEMS = [
     label: 'Pricing',
     icon: (
       <svg className='w-[17px] h-[17px]' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-        <path
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          strokeWidth={1.8}
-          d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z'
-        />
+        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.8} d='M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z' />
       </svg>
     ),
   },
 ]
-
 const Navbar = () => {
   const { user, setShowLogin, logout, credit } = useContext(AppContext)
   const navigate = useNavigate()
@@ -134,7 +113,7 @@ const Navbar = () => {
       <div className='fixed top-3 sm:top-4 inset-x-0 z-50 px-3 sm:px-4 pointer-events-none select-none flex justify-center'>
         <header
           role='banner'
-          className='pointer-events-auto w-full max-w-[1040px] h-[56px] sm:h-[60px] rounded-full bg-white/30 backdrop-blur-md border border-white/40 shadow-sm px-4 sm:px-6 flex items-center justify-between transition-all'
+          className='pointer-events-auto w-full max-w-[1140px] h-[56px] sm:h-[60px] rounded-full bg-white/30 backdrop-blur-md border border-white/40 shadow-sm px-4 sm:px-6 flex items-center justify-between transition-all'
         >
           {/* ── ZONE 1: LEFT (Brand Name) ── */}
           <div className='flex items-center shrink-0'>
