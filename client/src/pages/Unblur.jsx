@@ -179,11 +179,16 @@ const Unblur = () => {
                 onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
                 onDragLeave={() => setDragOver(false)}
                 onDrop={onDrop}
-                className={`relative rounded-[20px] border-2 border-dashed p-7 sm:p-9 cursor-pointer transition-all duration-300 flex flex-col items-center justify-center min-h-[260px] sm:min-h-[290px] overflow-hidden ${
+                className={`relative rounded-[20px] border border-dashed p-7 sm:p-9 cursor-pointer transition-all duration-300 flex flex-col items-center justify-center min-h-[260px] sm:min-h-[290px] overflow-hidden select-none ${
                   dragOver
-                    ? 'border-sky-500 bg-sky-50/50 shadow-[0_0_24px_rgba(2,132,199,0.12)]'
-                    : 'border-[#d2d2d7] bg-[#fafafc] hover:border-sky-400 hover:bg-white'
+                    ? 'border-sky-500 bg-sky-100/60 ring-4 ring-sky-500/10'
+                    : 'border-sky-300/80 hover:border-sky-400 hover:bg-sky-50/40'
                 }`}
+                style={{
+                  background: dragOver
+                    ? undefined
+                    : 'linear-gradient(180deg, #bae6fd 0%, #e0f2fe 45%, #ffffff 100%)',
+                }}
               >
                 <GrainOverlay />
                 <input
@@ -403,3 +408,4 @@ const Unblur = () => {
 }
 
 export default Unblur
+

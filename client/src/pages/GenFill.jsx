@@ -101,21 +101,52 @@ const GenFill = () => {
       {/* Upload zone */}
       {!originalImage && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4, delay: 0.1 }}
-          onClick={() => fileInputRef.current?.click()}
-          onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
-          onDragLeave={() => setDragOver(false)}
-          onDrop={onDrop}
-          className={`relative w-full max-w-2xl h-64 sm:h-72 rounded-[20px] border-2 border-dashed flex flex-col items-center justify-center gap-3 cursor-pointer overflow-hidden transition-all duration-300 select-none
-            ${dragOver ? 'border-emerald-400 bg-emerald-50/60 scale-[1.015]' : 'border-black/[0.10] bg-white/50 hover:border-emerald-300 hover:bg-white/70'}`}
+          initial={{ opacity: 0, scale: 0.97 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="w-full max-w-[580px]"
         >
-          <GrainOverlay />
-          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors ${dragOver ? 'bg-emerald-100' : 'bg-black/[0.04]'}`}>
-            <Upload className={`w-7 h-7 ${dragOver ? 'text-emerald-500' : 'text-[#86868b]'}`} />
-          </div>
-          <div className="text-center">
-            <p className="font-semibold text-[#1d1d1f]">{dragOver ? 'Drop it here!' : 'Drag & drop your image'}</p>
-            <p className="text-[#86868b] text-sm mt-0.5">or <span className="text-emerald-600 underline underline-offset-2">browse files</span></p>
+          <div className="bg-white rounded-[24px] border border-[#e5e5e7] p-2.5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_36px_rgba(0,0,0,0.07)] transition-all duration-300">
+            <div
+                onClick={() => fileInputRef.current?.click()}
+                onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={onDrop}
+                className={`relative rounded-[20px] border border-dashed p-7 sm:p-9 cursor-pointer transition-all duration-300 flex flex-col items-center justify-center min-h-[260px] sm:min-h-[290px] overflow-hidden select-none ${
+                  dragOver
+                    ? 'border-emerald-500 bg-emerald-100/60 ring-4 ring-emerald-500/10'
+                    : 'border-emerald-300/80 hover:border-emerald-400 hover:bg-emerald-50/40'
+                }`}
+                style={{
+                  background: dragOver
+                    ? undefined
+                    : 'linear-gradient(180deg, #a7f3d0 0%, #d1fae5 45%, #ffffff 100%)',
+                }}
+              >
+                <GrainOverlay />
+              <div className="w-14 h-14 rounded-2xl bg-white border border-[#e5e5e7] shadow-sm flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform duration-200">
+                <Upload className="w-6 h-6 text-emerald-600" />
+              </div>
+
+              <p className="text-sm sm:text-base font-semibold text-[#1d1d1f]">
+                Drop your photo here, or <span className="text-emerald-600 underline">browse</span>
+              </p>
+              <p className="text-xs text-[#86868b] mt-1.5">
+                Supports JPG, PNG, WEBP • Up to 25MB
+              </p>
+
+              {/* Feature Chips */}
+              <div className="flex flex-wrap items-center justify-center gap-1.5 mt-4 pt-3 border-t border-[#e5e5e7]/80 w-full max-w-sm">
+                {['Outpaint & Expand', 'Aspect Ratios', 'Scene Extension', 'Natural Fill'].map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-white border border-[#e5e5e7] text-[#6e6e73]"
+                  >
+                    ✓ {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
         </motion.div>
       )}
@@ -216,3 +247,4 @@ const GenFill = () => {
 }
 
 export default GenFill
+

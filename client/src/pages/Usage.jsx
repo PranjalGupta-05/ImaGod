@@ -13,17 +13,10 @@ import {
   PenTool,
   Expand,
   Focus,
+  BarChart3,
 } from 'lucide-react'
 
-const REQUIRE_AUTH = false
-
-const DEMO_STATS = {
-  creditsLeft: 3,
-  creditsUsed: 3,
-  totalCredits: 6,
-  features: { textToImage: 1, removeBg: 1, enhance: 1, aiEditor: 0, genFill: 0, unblur: 0 },
-  history: [],
-}
+// Auth required for viewing usage data
 
 // Grain texture overlay matching BuyCredit.jsx
 const GrainOverlay = () => (
@@ -87,8 +80,6 @@ const ThemeOrb = ({ theme, icon: Icon }) => {
 const Usage = () => {
   const { user, token, backendUrl, setShowLogin, setCredit } = useContext(AppContext)
 
-  const showGrid = REQUIRE_AUTH ? !!user : true
-
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [stats, setStats] = useState({
@@ -110,10 +101,7 @@ const Usage = () => {
 
   const fetchUsageData = useCallback(
     async (isBackground = false) => {
-      if (!token) {
-        if (!REQUIRE_AUTH) {
-          setStats(DEMO_STATS)
-        }
+      if (!token || !user) {
         setLoading(false)
         return
       }
@@ -150,16 +138,21 @@ const Usage = () => {
         setLoading(false)
       }
     },
-    [token, backendUrl, setCredit]
+    [token, user, backendUrl, setCredit]
   )
 
   useEffect(() => {
+    if (!user || !token) {
+      setLoading(false)
+      return
+    }
+
     fetchUsageData(false)
 
     const startPolling = () => {
       if (pollingTimerRef.current) clearInterval(pollingTimerRef.current)
       pollingTimerRef.current = setInterval(() => {
-        if (!document.hidden && token) {
+        if (!document.hidden && token && user) {
           fetchUsageData(true)
         }
       }, 5000)
@@ -168,7 +161,7 @@ const Usage = () => {
     startPolling()
 
     const handleVisibilityChange = () => {
-      if (!document.hidden && token) {
+      if (!document.hidden && token && user) {
         fetchUsageData(true)
       }
     }
@@ -178,7 +171,7 @@ const Usage = () => {
       if (pollingTimerRef.current) clearInterval(pollingTimerRef.current)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [fetchUsageData, token])
+  }, [fetchUsageData, token, user])
 
   const total = Math.max(stats.totalCredits, 1)
   const usedPercent = Math.min(100, Math.round((stats.creditsUsed / total) * 100))
@@ -295,6 +288,25 @@ const Usage = () => {
     },
   ]
 
+  // Not logged in state - exactly matching History page
+  if (!user) {
+    return (
+      <div className='flex flex-col items-center justify-center min-h-[70vh] gap-5 px-4'>
+        <ThemeOrb theme='purple' icon={BarChart3} />
+        <h2 className='text-[22px] font-bold text-ink'>Your Usage & Credits</h2>
+        <p className='text-[14px] text-[#6b7280] text-center max-w-sm'>
+          Sign in to view your real-time generation stats, credit consumption, and activity logs.
+        </p>
+        <button
+          onClick={() => setShowLogin('Login')}
+          className='px-7 py-2.5 rounded-full font-semibold text-[14px] bg-[#1d1d1f] hover:bg-black text-white shadow-[0_2px_10px_rgba(0,0,0,0.16)] transition-all active:scale-95 cursor-pointer'
+        >
+          Sign In
+        </button>
+      </div>
+    )
+  }
+
   return (
     <div className='w-full min-h-screen lg:h-screen lg:max-h-screen lg:overflow-hidden bg-[#fafafc] pt-20 sm:pt-22 pb-4 select-none flex flex-col justify-center'>
       <div className='max-w-[1180px] mx-auto px-4 sm:px-6 w-full'>
@@ -330,34 +342,10 @@ const Usage = () => {
           </div>
         )}
 
-        {/* Sign-in Gate */}
-        {!showGrid && (
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            className='bg-white rounded-[24px] border border-[#e5e5e7] p-8 text-center max-w-[500px] mx-auto shadow-[0_2px_12px_rgba(0,0,0,0.03)]'
-          >
-            <div className='w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-3 border border-blue-100'>
-              <Zap className='w-5 h-5' />
-            </div>
-            <h2 className='text-xl font-bold text-ink tracking-tight'>
-              Sign in to view your usage
-            </h2>
-            <p className='text-[13px] text-[#6e6e73] mt-1.5 mb-5 max-w-sm mx-auto'>
-              Sign in to access your real-time generation stats, credit consumption, and activity logs.
-            </p>
-            <button
-              type='button'
-              onClick={() => setShowLogin('Login')}
-              className='px-6 py-2 rounded-full bg-[#1d1d1f] hover:bg-black text-white text-[14px] font-medium shadow-[0_2px_8px_rgba(0,0,0,0.18)] transition-all cursor-pointer active:scale-95'
-            >
-              Sign In to Imagify
-            </button>
-          </motion.div>
-        )}
+
 
         {/* Loading Skeleton */}
-        {loading && showGrid && (
+        {loading && (
           <div className='grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5 items-stretch mb-0'>
             <div className='md:col-span-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
               {[...Array(6)].map((_, i) => (
@@ -376,7 +364,7 @@ const Usage = () => {
         )}
 
         {/* ──── Main Stats Grid ──── */}
-        {!loading && showGrid && (
+        {!loading && (
           <div className='grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5 items-stretch mb-0'>
 
             {/* Left: 6 Feature Cards (3-col on large, 2-col on medium, 1-col on mobile) */}
@@ -547,3 +535,4 @@ const Usage = () => {
 }
 
 export default Usage
+
