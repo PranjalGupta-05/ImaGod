@@ -4,10 +4,10 @@ import { assets } from '../assets/assets'
 
 const Footer = () => {
   return (
-    <footer className='w-full bg-canvas-parchment py-16 border-t border-hairline select-none'>
+    <footer className='w-full bg-[#f4f4f6] py-16 border-t border-neutral-200/60 select-none'>
       <div className='max-w-[1024px] mx-auto px-4 sm:px-6'>
         {/* Footnote / Disclaimer section */}
-        <div className='pb-8 mb-8 border-b border-hairline font-micro-legal text-ink-muted48 space-y-2'>
+        <div className='pb-8 mb-8 border-b border-neutral-200/60 text-xs text-neutral-500 space-y-2'>
           <p>
             1. Generation speed depends on network latency and cluster concurrency. High-resolution exports available on all plans.
           </p>
@@ -128,7 +128,7 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar: Copyright + Social Links */}
-        <div className='pt-6 border-t border-hairline flex flex-col sm:flex-row items-center justify-between gap-4'>
+        <div className='pt-6 border-t border-neutral-200/60 flex flex-col sm:flex-row items-center justify-between gap-4'>
           <div className='flex items-center gap-3'>
             <span className='font-display text-ink font-semibold text-[14px]'>
               Imagify

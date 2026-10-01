@@ -8,17 +8,17 @@ const Steps = () => {
   const navigate = useNavigate()
 
   return (
-    <div id="how-it-works" className="w-full bg-[#f5f5f7] select-none border-b border-[#e0e0e0]">
+    <div id="how-it-works" className="w-full bg-canvas select-none relative pt-12 pb-6">
       {/* Intro Header Section */}
-      <div className="max-w-[1024px] mx-auto pt-16 sm:pt-20 px-4 sm:px-6 text-center">
+      <div className="max-w-[1024px] mx-auto pt-12 sm:pt-16 px-4 sm:px-6 text-center">
         <motion.span
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-primary/[0.08] text-primary text-[12px] font-semibold tracking-wide uppercase mb-4"
+          className="inline-flex items-center gap-2 px-3 py-1 bg-neon text-black font-extrabold text-[11px] sm:text-xs tracking-widest uppercase mb-5 shadow-xs"
         >
-          Product Timeline · Pipeline
+          <span>PRODUCT PIPELINE · 01 — 06</span>
         </motion.span>
 
         <motion.h2
@@ -26,9 +26,9 @@ const Steps = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="font-display-lg text-ink text-3xl sm:text-4xl lg:text-[42px] font-semibold tracking-tight"
+          className="font-display text-4xl sm:text-5xl lg:text-[56px] font-extrabold uppercase text-ink tracking-[-0.03em] leading-[0.96]"
         >
-          How Imagify Delivers Studio Excellence
+          HOW IMAGIFY DELIVERS STUDIO EXCELLENCE
         </motion.h2>
 
         <motion.p
@@ -36,7 +36,7 @@ const Steps = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="font-lead text-[#6e6e73] text-base sm:text-lg lg:text-[19px] mt-3 mb-6 max-w-[680px] mx-auto leading-relaxed"
+          className="text-neutral-600 text-base sm:text-lg lg:text-[18px] mt-4 mb-6 max-w-[640px] mx-auto leading-relaxed font-normal"
         >
           From natural language input to 4K publication-ready output — discover how each stage in our 6-phase neural pipeline guarantees unmatched fidelity, speed, and precision.
         </motion.p>
@@ -46,15 +46,13 @@ const Steps = () => {
       <Timeline
         title="Creation Pipeline"
         periodLabel="Phase 01 — 06"
-        textColor="#1d1d1f"
-        mutedTextColor="#6e6e73"
+        textColor="#0f0f11"
+        mutedTextColor="#5a5a62"
         activeColor="#0066cc"
-        backgroundColor="#f5f5f7"
+        backgroundColor="#fafafc"
         imageUrl={sample_img_1}
         imageAlt="Imagify Studio Neural Output"
       />
-
-
     </div>
   )
 }

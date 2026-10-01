@@ -1,8 +1,8 @@
 import React from 'react'
-import ScrollMorphHero from './ScrollMorphHero'
+import VideoHero from './VideoHero'
 
 const Header = () => {
-  return <ScrollMorphHero />
+  return <VideoHero />
 }
 
 export default Header

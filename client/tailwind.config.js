@@ -11,15 +11,23 @@ export default {
       },
       colors: {
         canvas: '#fafafc',
-        ink: '#1d1d1f',
+        ink: '#0f0f11',
         primary: {
           DEFAULT: '#0066cc',
           focus: '#0071e3',
           dark: '#2997ff',
         },
+        neon: {
+          DEFAULT: '#e8ff3b',
+          hover: '#d4f932',
+        },
       },
       fontFamily: {
-        poppins: ['"Poppins"', 'sans-serif'],
+        sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['"Clash Display"', '"Cabinet Grotesk"', '"Syne"', 'sans-serif'],
+        grotesk: ['"Cabinet Grotesk"', '"Space Grotesk"', 'sans-serif'],
+        mono: ['"Space Grotesk"', 'monospace'],
+        poppins: ['"Plus Jakarta Sans"', 'sans-serif'], // fallback redirect
       },
     },
   },
