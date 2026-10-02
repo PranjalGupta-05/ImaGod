@@ -1,8 +1,10 @@
-﻿import React, { useContext, useEffect, useState, useCallback } from 'react'
+import React, { useContext, useEffect, useState, useCallback } from 'react'
 import { AppContext } from '../context/AppContext'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import ThemeOrb from '../components/ui/ThemeOrb'
+import Button from '../components/ui/Button'
 import {
   Clock,
   Image as ImageIcon,
@@ -14,33 +16,9 @@ import {
   Download,
   Trash2,
   X,
-  Filter,
   RefreshCw,
   ExternalLink,
 } from 'lucide-react'
-
-// Grain texture overlay matching other pages
-const GrainOverlay = () => (
-  <div
-    className='absolute inset-0 pointer-events-none opacity-[0.035] mix-blend-overlay rounded-[20px]'
-    style={{
-      backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-    }}
-  />
-)
-
-// Theme Orb matching other pages
-const ThemeOrb = ({ icon: Icon }) => (
-  <div
-    className='relative w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-transform duration-300 hover:scale-105 shadow-[0_8px_18px_-2px_rgba(139,92,246,0.40)]'
-    style={{
-      background: 'radial-gradient(circle at 35% 30%, #c4b5fd 0%, #8b5cf6 55%, #6d28d9 100%)',
-    }}
-  >
-    <div className='absolute top-1.5 left-2 w-3.5 h-2 rounded-full bg-white/45 blur-[0.5px] -rotate-45 pointer-events-none' />
-    <Icon className='w-5 h-5 text-white z-10 stroke-[2]' />
-  </div>
-)
 
 // Feature metadata
 const FEATURE_META = {
@@ -90,7 +68,7 @@ const timeAgo = (dateStr) => {
 // Skeleton loader card
 const SkeletonCard = ({ index }) => (
   <div
-    className='rounded-[18px] bg-white border border-[#e5e5e7] overflow-hidden animate-pulse'
+    className='rounded-card-inner bg-white border border-line overflow-hidden animate-pulse'
     style={{ animationDelay: `${index * 80}ms` }}
   >
     <div className='aspect-square bg-gradient-to-b from-gray-100 to-gray-50' />
@@ -168,17 +146,18 @@ const History = () => {
   if (!user) {
     return (
       <div className='flex flex-col items-center justify-center min-h-[70vh] gap-5 px-4'>
-        <ThemeOrb icon={Clock} />
-        <h2 className='text-[22px] font-bold text-ink'>Your Creation History</h2>
-        <p className='text-[14px] text-[#6b7280] text-center max-w-sm'>
+        <ThemeOrb theme='purple' icon={Clock} />
+        <h2 className='text-[22px] font-bold font-primary text-ink'>Your Creation History</h2>
+        <p className='text-[14px] font-body text-ink-muted text-center max-w-sm'>
           Sign in to view all images you've created and processed with our AI tools.
         </p>
-        <button
+        <Button
           onClick={() => setShowLogin('Login')}
-          className='px-7 py-2.5 rounded-full font-semibold text-[14px] bg-[#1d1d1f] hover:bg-black text-white shadow-[0_2px_10px_rgba(0,0,0,0.16)] transition-all active:scale-95 cursor-pointer'
+          variant='primary'
+          size='md'
         >
           Sign In
-        </button>
+        </Button>
       </div>
     )
   }
@@ -192,11 +171,11 @@ const History = () => {
         transition={{ duration: 0.4 }}
         className='flex flex-col items-center gap-3 mb-7'
       >
-        <ThemeOrb icon={Clock} />
-        <h1 className='text-[26px] sm:text-[32px] font-bold text-ink tracking-tight text-center'>
+        <ThemeOrb theme='purple' icon={Clock} />
+        <h1 className='text-[26px] sm:text-[32px] font-bold font-primary text-ink tracking-tight text-center'>
           Creation History
         </h1>
-        <p className='text-[14px] text-[#6b7280] text-center max-w-md'>
+        <p className='text-[14px] font-body text-ink-muted text-center max-w-md'>
           Every image you've generated, enhanced, and transformed — stored in your cloud.
         </p>
       </motion.div>
@@ -208,15 +187,15 @@ const History = () => {
         transition={{ duration: 0.35, delay: 0.1 }}
         className='w-full flex flex-col sm:flex-row items-center justify-between gap-3 mb-6'
       >
-        <div className='flex items-center gap-1.5 flex-wrap justify-center bg-white/80 backdrop-blur-sm border border-[#e5e5e7] rounded-full px-1.5 py-1.5 shadow-[0_1px_4px_rgba(0,0,0,0.03)]'>
+        <div className='flex items-center gap-1.5 flex-wrap justify-center bg-white/80 backdrop-blur-sm border border-line rounded-full px-1.5 py-1.5 shadow-2xs'>
           {FILTER_TABS.map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveFilter(tab.key)}
               className={`px-3.5 py-1.5 rounded-full text-[12px] font-semibold transition-all duration-200 cursor-pointer ${
                 activeFilter === tab.key
-                  ? 'bg-[#1d1d1f] text-white shadow-sm'
-                  : 'text-[#6b7280] hover:text-ink hover:bg-gray-50'
+                  ? 'bg-neutral-900 text-white shadow-2xs font-bold'
+                  : 'text-ink-muted hover:text-ink hover:bg-neutral-100'
               }`}
             >
               {tab.label}
@@ -225,13 +204,13 @@ const History = () => {
         </div>
 
         <div className='flex items-center gap-2.5'>
-          <span className='text-[12px] text-[#6b7280] font-medium'>
+          <span className='text-[12px] font-body text-ink-muted font-medium'>
             {total} image{total !== 1 ? 's' : ''}
           </span>
           <button
             onClick={handleRefresh}
             disabled={refreshing}
-            className='p-2 rounded-full bg-white hover:bg-violet-50 border border-[#e5e5e7] shadow-2xs transition-all active:scale-95 cursor-pointer disabled:opacity-50'
+            className='p-2 rounded-full bg-white hover:bg-violet-50 border border-line shadow-2xs transition-all active:scale-95 cursor-pointer disabled:opacity-50'
             title='Refresh'
           >
             <RefreshCw className={`w-3.5 h-3.5 text-violet-600 ${refreshing ? 'animate-spin' : ''}`} />
@@ -253,18 +232,19 @@ const History = () => {
           className='flex flex-col items-center justify-center py-20 gap-4'
         >
           <div className='w-16 h-16 rounded-full bg-violet-50 border border-violet-100 flex items-center justify-center'>
-            <ImageIcon className='w-7 h-7 text-violet-300' />
+            <ImageIcon className='w-7 h-7 text-violet-400' />
           </div>
-          <h3 className='text-[16px] font-semibold text-ink'>No images yet</h3>
-          <p className='text-[13px] text-[#6b7280] text-center max-w-xs'>
+          <h3 className='text-[16px] font-semibold font-primary text-ink'>No images yet</h3>
+          <p className='text-[13px] font-body text-ink-muted text-center max-w-xs'>
             Start creating with any of our AI tools and your images will appear here automatically.
           </p>
-          <button
+          <Button
             onClick={() => navigate('/result')}
-            className='px-5 py-2 rounded-full text-[13px] font-semibold bg-violet-600 hover:bg-violet-700 text-white shadow-sm transition-all active:scale-95 cursor-pointer'
+            variant='purple'
+            size='md'
           >
             Create Your First Image
-          </button>
+          </Button>
         </motion.div>
       ) : (
         <motion.div
@@ -283,11 +263,11 @@ const History = () => {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.25, delay: 0.03 * index }}
-                className='group relative rounded-[18px] bg-white border border-[#e5e5e7] overflow-hidden shadow-[0_1px_6px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.08)] hover:border-violet-200 transition-all duration-300'
+                className='group relative rounded-card-inner bg-white border border-line overflow-hidden shadow-2xs hover:shadow-card hover:border-violet-300 transition-all duration-300'
               >
                 {/* Thumbnail */}
                 <div
-                  className='aspect-square overflow-hidden cursor-pointer relative bg-gray-50'
+                  className='aspect-square overflow-hidden cursor-pointer relative bg-neutral-100'
                   onClick={() => setLightboxImage(img)}
                 >
                   <img
@@ -306,7 +286,7 @@ const History = () => {
 
                   {/* Feature badge */}
                   <div
-                    className='absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold backdrop-blur-md shadow-sm border'
+                    className='absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold backdrop-blur-md shadow-2xs border'
                     style={{
                       backgroundColor: meta.bg + 'e6',
                       color: meta.color,
@@ -322,15 +302,15 @@ const History = () => {
                 <div className='px-3 py-2.5 flex items-center justify-between gap-2'>
                   <div className='flex flex-col gap-0.5 min-w-0 flex-1'>
                     {img.prompt ? (
-                      <span className='text-[11px] font-semibold text-ink truncate capitalize' title={img.prompt}>
+                      <span className='text-[11px] font-semibold font-body text-ink truncate capitalize' title={img.prompt}>
                         "{img.prompt}"
                       </span>
                     ) : null}
                     <div className='flex items-center gap-1.5'>
-                      <span className='text-[11px] text-[#6b7280] font-medium truncate'>
+                      <span className='text-[11px] font-body text-ink-muted font-medium truncate'>
                         {timeAgo(img.createdAt)}
                       </span>
-                      <span className='text-[10px] text-[#9ca3af] shrink-0'>
+                      <span className='text-[10px] font-body text-neutral-400 shrink-0'>
                         {formatBytes(img.bytes)}
                       </span>
                     </div>
@@ -342,7 +322,7 @@ const History = () => {
                       target='_blank'
                       rel='noreferrer'
                       onClick={(e) => e.stopPropagation()}
-                      className='p-1.5 rounded-full hover:bg-violet-50 text-[#9ca3af] hover:text-violet-600 transition-colors cursor-pointer'
+                      className='p-1.5 rounded-full hover:bg-neutral-100 text-neutral-400 hover:text-ink transition-colors cursor-pointer'
                       title='Download'
                     >
                       <Download className='w-3.5 h-3.5' />
@@ -350,11 +330,11 @@ const History = () => {
                     <button
                       onClick={(e) => { e.stopPropagation(); handleDelete(img.publicId) }}
                       disabled={deleting === img.publicId}
-                      className='p-1.5 rounded-full hover:bg-red-50 text-[#9ca3af] hover:text-red-500 transition-colors cursor-pointer disabled:opacity-50'
+                      className='p-1.5 rounded-full hover:bg-rose-50 text-neutral-400 hover:text-rose-600 transition-colors cursor-pointer disabled:opacity-50'
                       title='Delete'
                     >
                       {deleting === img.publicId ? (
-                        <span className='inline-block w-3.5 h-3.5 border-2 border-red-400 border-t-transparent rounded-full animate-spin' />
+                        <span className='inline-block w-3.5 h-3.5 border-2 border-rose-500 border-t-transparent rounded-full animate-spin' />
                       ) : (
                         <Trash2 className='w-3.5 h-3.5' />
                       )}
@@ -395,7 +375,7 @@ const History = () => {
               </button>
 
               {/* Image */}
-              <div className='rounded-[16px] overflow-hidden bg-white/5 border border-white/10 shadow-2xl'>
+              <div className='rounded-card overflow-hidden bg-white/5 border border-white/10 shadow-2xl'>
                 <img
                   src={lightboxImage.url}
                   alt='Full view'
@@ -404,7 +384,7 @@ const History = () => {
               </div>
 
               {lightboxImage.prompt ? (
-                <div className='bg-white/10 backdrop-blur-md rounded-full px-5 py-2 border border-white/10 text-white text-[13px] font-medium max-w-lg text-center truncate'>
+                <div className='bg-white/10 backdrop-blur-md rounded-full px-5 py-2 border border-white/10 text-white text-[13px] font-body font-medium max-w-lg text-center truncate'>
                   "{lightboxImage.prompt}"
                 </div>
               ) : null}
@@ -415,18 +395,18 @@ const History = () => {
                   const meta = FEATURE_META[lightboxImage.feature] || FEATURE_META.unknown
                   const FeatureIcon = meta.icon
                   return (
-                    <div className='flex items-center gap-1.5 text-white/80 text-[12px] font-medium'>
+                    <div className='flex items-center gap-1.5 text-white/80 text-[12px] font-medium font-body'>
                       <FeatureIcon className='w-3.5 h-3.5' />
                       {meta.label}
                     </div>
                   )
                 })()}
                 <span className='text-white/40'>|</span>
-                <span className='text-white/60 text-[12px]'>
+                <span className='text-white/60 text-[12px] font-body'>
                   {lightboxImage.width}x{lightboxImage.height}
                 </span>
                 <span className='text-white/40'>|</span>
-                <span className='text-white/60 text-[12px]'>
+                <span className='text-white/60 text-[12px] font-body'>
                   {formatBytes(lightboxImage.bytes)}
                 </span>
                 <a
@@ -434,10 +414,11 @@ const History = () => {
                   download
                   target='_blank'
                   rel='noreferrer'
-                  className='ml-2 px-4 py-1.5 rounded-full text-[12px] font-semibold bg-white text-ink hover:bg-violet-50 transition-colors cursor-pointer flex items-center gap-1.5'
+                  className='ml-2 inline-flex'
                 >
-                  <Download className='w-3 h-3' />
-                  Download
+                  <Button variant='secondary' size='sm' icon={Download}>
+                    Download
+                  </Button>
                 </a>
               </div>
             </motion.div>

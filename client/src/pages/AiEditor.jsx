@@ -1,31 +1,19 @@
-﻿import React, { useContext, useRef, useState, useCallback } from 'react'
+import React, { useContext, useRef, useState, useCallback } from 'react'
 import { AppContext } from '../context/AppContext'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Wand2, RefreshCw, Upload, Download, RotateCcw, Palette, SwitchCamera } from 'lucide-react'
-
-const GrainOverlay = () => (
-  <div
-    className="absolute inset-0 pointer-events-none opacity-[0.035] mix-blend-overlay rounded-[20px]"
-    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}
-  />
-)
-
-const ThemeOrb = ({ icon: Icon, gradient, shadow }) => (
-  <div
-    className="relative w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-lg"
-    style={{ background: gradient, boxShadow: shadow }}
-  >
-    <div className="absolute top-1.5 left-2 w-3.5 h-2 rounded-full bg-white/45 blur-[0.5px] -rotate-45 pointer-events-none" />
-    <Icon className="w-5 h-5 text-white z-10 stroke-[2]" />
-  </div>
-)
+import { Wand2, Upload, Download, RotateCcw, Palette, SwitchCamera } from 'lucide-react'
+import GrainOverlay from '../components/ui/GrainOverlay'
+import ThemeOrb from '../components/ui/ThemeOrb'
+import Button from '../components/ui/Button'
+import Input from '../components/ui/Input'
+import { Card, CardInner, PageHeader } from '../components/ui/Card'
 
 const TABS = [
-  { id: 'replace', label: 'Replace Object', icon: SwitchCamera, gradient: 'radial-gradient(circle at 35% 30%, #a78bfa 0%, #7c3aed 55%, #4c1d95 100%)', shadow: '0 8px 18px -2px rgba(124,58,237,0.45)' },
-  { id: 'recolor', label: 'Recolor Object', icon: Palette,     gradient: 'radial-gradient(circle at 35% 30%, #fb923c 0%, #ea580c 55%, #9a3412 100%)', shadow: '0 8px 18px -2px rgba(234,88,12,0.45)' },
+  { id: 'replace', label: 'Replace Object', icon: SwitchCamera, theme: 'purple' },
+  { id: 'recolor', label: 'Recolor Object', icon: Palette, theme: 'orange' },
 ]
 
-const RECOLOR_PRESETS = ['red','blue','green','yellow','pink','purple','orange','black','white','gold','silver','teal']
+const RECOLOR_PRESETS = ['red', 'blue', 'green', 'yellow', 'pink', 'purple', 'orange', 'black', 'white', 'gold', 'silver', 'teal']
 
 const AiEditor = () => {
   const { genReplace, genRecolor, credit, user, setShowLogin } = useContext(AppContext)
@@ -91,7 +79,7 @@ const AiEditor = () => {
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
-  const activeTab = TABS.find(t => t.id === tab)
+  const activeTab = TABS.find(t => t.id === tab) || TABS[0]
 
   return (
     <div
@@ -99,87 +87,90 @@ const AiEditor = () => {
       onMouseMove={onSliderMouseMove} onMouseUp={onSliderMouseUp}
       onTouchMove={onSliderMouseMove} onTouchEnd={onSliderMouseUp}
     >
-      {/* Header */}
-      <motion.div initial={{ opacity: 0, y: -24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }} className="text-center mb-8 max-w-xl">
-        <div className="flex items-center justify-center gap-3 mb-4">
-          <ThemeOrb icon={Wand2} gradient={activeTab.gradient} shadow={activeTab.shadow} />
-          <div className="text-left">
-            <span className="block text-[11px] font-bold tracking-widest uppercase text-[#86868b] mb-0.5">Cloudinary Generative AI</span>
-            <h1 className="text-3xl sm:text-4xl font-bold text-[#1d1d1f] leading-tight">AI Editor</h1>
-          </div>
-        </div>
-        <p className="text-[#6e6e73] text-sm leading-relaxed">
-          Replace any object in your photo or recolor it with a single text prompt. Powered by Cloudinary&apos;s Generative AI.
-        </p>
-        <p className="mt-2 text-xs text-[#86868b]">
-          Costs <span className="font-semibold text-[#1d1d1f]">1 credit</span> per edit &nbsp;·&nbsp; Credits:&nbsp;
-          <span className="font-bold" style={{ color: '#7c3aed' }}>{user ? credit : '—'}</span>
-        </p>
-      </motion.div>
+      {/* Unified Page Header */}
+      <PageHeader
+        category="Cloudinary Generative AI"
+        title="AI Editor"
+        description="Replace any object in your photo or recolor it with a single text prompt. Powered by Cloudinary's Generative AI."
+        creditCost={1}
+        userCredit={credit}
+        isAuthenticated={!!user}
+        theme={activeTab.theme}
+        icon={activeTab.icon}
+      />
 
-      {/* Tab switcher */}
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.4 }} className="flex bg-black/[0.04] rounded-full p-1 mb-8 gap-1">
+      {/* Standardized Tab Switcher */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.4 }}
+        className="flex bg-neutral-100/90 border border-neutral-200/80 rounded-full p-1 mb-8 gap-1 shadow-2xs"
+      >
         {TABS.map(t => (
           <button
             key={t.id}
+            type="button"
             onClick={() => { setTab(t.id); setResultImage(null) }}
-            className={`flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${tab === t.id ? 'bg-white shadow text-[#1d1d1f]' : 'text-[#6e6e73] hover:text-[#1d1d1f]'}`}
+            className={`flex items-center gap-2 px-5 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer ${
+              tab === t.id
+                ? 'bg-white shadow-xs text-ink font-bold'
+                : 'text-ink-muted hover:text-ink hover:bg-white/50'
+            }`}
           >
             <t.icon className="w-3.5 h-3.5" /> {t.label}
           </button>
         ))}
       </motion.div>
 
-      {/* Upload zone */}
+      {/* Upload Zone */}
       {!originalImage && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.97 }}
+          initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4, delay: 0.15 }}
           className="w-full max-w-[580px]"
         >
-          <div className="bg-white rounded-[24px] border border-[#e5e5e7] p-2.5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_36px_rgba(0,0,0,0.07)] transition-all duration-300">
-            <div
-                onClick={() => fileInputRef.current?.click()}
-                onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
-                onDragLeave={() => setDragOver(false)}
-                onDrop={onDrop}
-                className={`relative rounded-[20px] border border-dashed p-7 sm:p-9 cursor-pointer transition-all duration-300 flex flex-col items-center justify-center min-h-[260px] sm:min-h-[290px] overflow-hidden select-none ${
-                  dragOver
-                    ? 'border-violet-500 bg-violet-100/60 ring-4 ring-violet-500/10'
-                    : 'border-violet-300/80 hover:border-violet-400 hover:bg-violet-50/40'
-                }`}
-                style={{
-                  background: dragOver
-                    ? undefined
-                    : 'linear-gradient(180deg, #ddd6fe 0%, #ede9fe 45%, #ffffff 100%)',
-                }}
-              >
-                <GrainOverlay />
-              <div className="w-14 h-14 rounded-2xl bg-white border border-[#e5e5e7] shadow-sm flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform duration-200">
+          <Card>
+            <CardInner
+              onClick={() => fileInputRef.current?.click()}
+              onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={onDrop}
+              className={`p-7 sm:p-9 cursor-pointer transition-all duration-300 flex flex-col items-center justify-center min-h-[260px] sm:min-h-[290px] text-center ${
+                dragOver
+                  ? 'border-violet-500 bg-violet-100/60 ring-4 ring-violet-500/10'
+                  : 'border-violet-300/80 hover:border-violet-400 hover:bg-violet-50/40'
+              }`}
+              style={{
+                background: dragOver
+                  ? undefined
+                  : 'linear-gradient(180deg, #ddd6fe 0%, #ede9fe 45%, #ffffff 100%)',
+              }}
+            >
+              <div className="w-14 h-14 rounded-2xl bg-white border border-line shadow-2xs flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform duration-200">
                 <Upload className="w-6 h-6 text-violet-600" />
               </div>
 
-              <p className="text-sm sm:text-base font-semibold text-[#1d1d1f]">
-                Drop your photo here, or <span className="text-violet-600 underline">browse</span>
+              <p className="text-sm sm:text-base font-semibold text-ink">
+                Drop your photo here, or <span className="text-violet-600 underline font-bold">browse</span>
               </p>
-              <p className="text-xs text-[#86868b] mt-1.5">
+              <p className="text-xs text-ink-muted mt-1.5">
                 Supports JPG, PNG, WEBP • Up to 25MB
               </p>
 
               {/* Feature Chips */}
-              <div className="flex flex-wrap items-center justify-center gap-1.5 mt-4 pt-3 border-t border-[#e5e5e7]/80 w-full max-w-sm">
+              <div className="flex flex-wrap items-center justify-center gap-1.5 mt-4 pt-3 border-t border-line/80 w-full max-w-sm">
                 {['Object Replace', 'Color Switch', 'Clothing & Props', 'Natural Blending'].map((tag) => (
                   <span
                     key={tag}
-                    className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-white border border-[#e5e5e7] text-[#6e6e73]"
+                    className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-white/80 border border-line text-ink-muted"
                   >
                     ✓ {tag}
                   </span>
                 ))}
               </div>
-            </div>
-          </div>
+            </CardInner>
+          </Card>
         </motion.div>
       )}
       <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={onFileChange} />
@@ -187,54 +178,93 @@ const AiEditor = () => {
       {/* Image loaded – show controls + preview */}
       <AnimatePresence>
         {originalImage && !resultImage && (
-          <motion.div key="controls" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.4 }} className="flex flex-col items-center gap-6 w-full max-w-2xl">
-            {/* Preview */}
-            <div className="relative w-full rounded-[20px] overflow-hidden shadow-xl bg-white border border-black/[0.06]">
-              <img src={originalImage} alt="Preview" className="w-full max-h-80 object-contain" />
-              {loading && (
-                <div className="absolute inset-0 bg-white/85 backdrop-blur-sm flex flex-col items-center justify-center gap-4">
-                  <div className="flex gap-1.5">
-                    {[0,1,2,3,4].map(i => (
-                      <motion.div key={i} animate={{ scaleY: [0.4, 1.8, 0.4] }} transition={{ duration: 0.9, repeat: Infinity, delay: i * 0.12, ease: 'easeInOut' }} className="w-1.5 h-7 rounded-full origin-bottom" style={{ background: activeTab.gradient }} />
-                    ))}
+          <motion.div
+            key="controls"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.4 }}
+            className="flex flex-col items-center gap-6 w-full max-w-2xl"
+          >
+            {/* Preview Frame */}
+            <div className="relative w-full rounded-[24px] overflow-hidden shadow-card bg-white border border-line p-2">
+              <div className="relative rounded-[18px] overflow-hidden bg-neutral-50 flex items-center justify-center">
+                <img src={originalImage} alt="Preview" className="w-full max-h-80 object-contain" />
+                {loading && (
+                  <div className="absolute inset-0 bg-white/85 backdrop-blur-sm flex flex-col items-center justify-center gap-4">
+                    <div className="flex gap-1.5">
+                      {[0, 1, 2, 3, 4].map(i => (
+                        <motion.div
+                          key={i}
+                          animate={{ scaleY: [0.4, 1.8, 0.4] }}
+                          transition={{ duration: 0.9, repeat: Infinity, delay: i * 0.12, ease: 'easeInOut' }}
+                          className={`w-1.5 h-7 rounded-full origin-bottom ${tab === 'replace' ? 'bg-violet-600' : 'bg-orange-500'}`}
+                        />
+                      ))}
+                    </div>
+                    <p className="text-ink text-sm font-semibold">Generative AI is editing…</p>
                   </div>
-                  <p className="text-[#1d1d1f] text-sm font-semibold">Generative AI is editing…</p>
-                </div>
-              )}
+                )}
+              </div>
             </div>
 
             {/* Input fields */}
             <AnimatePresence mode="wait">
               {tab === 'replace' ? (
-                <motion.div key="replace-fields" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} className="w-full grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-[#6e6e73] mb-1.5 ml-1">Replace this object</label>
-                    <input value={fromObj} onChange={e => setFromObj(e.target.value)} placeholder='e.g. "jacket"' className="w-full px-4 py-3 rounded-[12px] bg-white border border-black/[0.08] text-sm text-[#1d1d1f] placeholder-[#86868b] focus:outline-none focus:ring-2 focus:ring-violet-400/50" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-[#6e6e73] mb-1.5 ml-1">Replace with</label>
-                    <input value={toObj} onChange={e => setToObj(e.target.value)} placeholder='e.g. "leather jacket"' className="w-full px-4 py-3 rounded-[12px] bg-white border border-black/[0.08] text-sm text-[#1d1d1f] placeholder-[#86868b] focus:outline-none focus:ring-2 focus:ring-violet-400/50" />
-                  </div>
+                <motion.div
+                  key="replace-fields"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 10 }}
+                  className="w-full grid grid-cols-1 sm:grid-cols-2 gap-3"
+                >
+                  <Input
+                    label="Replace this object"
+                    value={fromObj}
+                    onChange={e => setFromObj(e.target.value)}
+                    placeholder='e.g. "jacket"'
+                  />
+                  <Input
+                    label="Replace with"
+                    value={toObj}
+                    onChange={e => setToObj(e.target.value)}
+                    placeholder='e.g. "leather jacket"'
+                  />
                 </motion.div>
               ) : (
-                <motion.div key="recolor-fields" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="w-full flex flex-col gap-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-[#6e6e73] mb-1.5 ml-1">Object to recolor</label>
-                    <input value={recolorPrompt} onChange={e => setRecolorPrompt(e.target.value)} placeholder='e.g. "the car", "the shirt", "the sofa"' className="w-full px-4 py-3 rounded-[12px] bg-white border border-black/[0.08] text-sm text-[#1d1d1f] placeholder-[#86868b] focus:outline-none focus:ring-2 focus:ring-orange-400/50" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-[#6e6e73] mb-2 ml-1">Target color</label>
-                    <div className="flex flex-wrap gap-2">
+                <motion.div
+                  key="recolor-fields"
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  className="w-full flex flex-col gap-4"
+                >
+                  <Input
+                    label="Object to recolor"
+                    value={recolorPrompt}
+                    onChange={e => setRecolorPrompt(e.target.value)}
+                    placeholder='e.g. "the car", "the shirt", "the sofa"'
+                  />
+                  <div className="bg-white rounded-input border border-line p-3">
+                    <label className="block text-xs font-semibold text-ink-muted mb-2">Target color</label>
+                    <div className="flex flex-wrap items-center gap-2">
                       {RECOLOR_PRESETS.map(c => (
-                        <button key={c} onClick={() => setRecolorColor(c)}
-                          className={`w-8 h-8 rounded-full border-2 transition-all ${recolorColor === c ? 'scale-110 border-[#1d1d1f]' : 'border-transparent hover:scale-105'}`}
-                          style={{ background: c, boxShadow: recolorColor === c ? '0 0 0 2px white, 0 0 0 4px #1d1d1f' : 'none' }}
+                        <button
+                          key={c}
+                          type="button"
+                          onClick={() => setRecolorColor(c)}
+                          className={`w-7 h-7 rounded-full border-2 transition-all cursor-pointer ${
+                            recolorColor === c ? 'scale-110 border-ink ring-2 ring-primary/20' : 'border-transparent hover:scale-105'
+                          }`}
+                          style={{ background: c }}
                           title={c}
                         />
                       ))}
-                      <input type="color" value={`#${recolorColor.startsWith('#') ? recolorColor.slice(1) : 'ef4444'}`}
+                      <input
+                        type="color"
+                        value={`#${recolorColor.startsWith('#') ? recolorColor.slice(1) : 'ef4444'}`}
                         onChange={e => setRecolorColor(e.target.value)}
-                        className="w-8 h-8 rounded-full border-2 border-black/[0.1] cursor-pointer"
+                        className="w-7 h-7 rounded-full border border-line cursor-pointer p-0 overflow-hidden"
                         title="Custom color"
                       />
                     </div>
@@ -245,54 +275,114 @@ const AiEditor = () => {
 
             {/* Action buttons */}
             <div className="flex flex-wrap gap-3 justify-center">
-              <button onClick={onSubmit} disabled={loading}
-                className="flex items-center gap-2 text-white px-8 py-3 rounded-full font-semibold text-sm disabled:opacity-50 hover:scale-[1.03] active:scale-95 transition-all shadow-lg"
-                style={{ background: activeTab.gradient, boxShadow: activeTab.shadow }}
+              <Button
+                onClick={onSubmit}
+                loading={loading}
+                variant={activeTab.theme}
+                size="lg"
+                icon={Wand2}
               >
-                {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
                 {loading ? 'Generating…' : (tab === 'replace' ? 'Replace Object' : 'Recolor Object')}
-              </button>
-              <button onClick={() => fileInputRef.current?.click()} disabled={loading} className="border border-black/[0.10] text-[#6e6e73] px-6 py-3 rounded-full text-sm hover:text-[#1d1d1f] hover:border-black/[0.2] transition-all disabled:opacity-50">
+              </Button>
+              <Button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={loading}
+                variant="secondary"
+                size="lg"
+              >
                 Change Image
-              </button>
+              </Button>
             </div>
           </motion.div>
         )}
 
         {/* Result with before/after slider */}
         {resultImage && (
-          <motion.div key="result" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="flex flex-col items-center gap-6 w-full max-w-2xl">
-            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-              className="flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-full border"
-              style={{ background: `${activeTab.gradient.replace('radial-gradient', 'linear-gradient')}10`, borderColor: '#e5e7eb', color: '#4b5563' }}
+          <motion.div
+            key="result"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex flex-col items-center gap-6 w-full max-w-2xl"
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+              className="flex items-center gap-2 text-xs sm:text-sm font-semibold px-4 py-2 rounded-full border border-line bg-white shadow-2xs text-ink"
             >
-              <Wand2 className="w-4 h-4" /> Edit complete!
+              <ThemeOrb theme={activeTab.theme} icon={Wand2} size="sm" />
+              <span>Edit complete!</span>
             </motion.div>
 
-            <p className="text-[#86868b] text-sm">Drag the slider to compare original vs. edited</p>
+            <p className="text-ink-muted text-sm">Drag the slider to compare original vs. edited</p>
 
-            <div ref={sliderContainerRef} className="relative w-full rounded-[20px] overflow-hidden shadow-2xl select-none cursor-col-resize border border-black/[0.06]" style={{ aspectRatio: '4/3' }} onMouseDown={onSliderMouseDown} onTouchStart={onSliderMouseDown}>
-              <img src={originalImage} alt="Before" className="absolute inset-0 w-full h-full object-contain bg-[#f5f5f7]" style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }} draggable={false} />
-              <img src={resultImage} alt="After" className="absolute inset-0 w-full h-full object-contain bg-white" style={{ clipPath: `inset(0 0 0 ${sliderPos}%)` }} draggable={false} />
-              <div className="absolute top-0 bottom-0 w-0.5 bg-white shadow-lg" style={{ left: `${sliderPos}%` }}>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 bg-white rounded-full shadow-xl flex items-center justify-center border border-black/[0.08]">
-                  <svg className="w-4 h-4 text-[#6e6e73]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l-4 3 4 3M16 9l4 3-4 3" /></svg>
+            <div
+              ref={sliderContainerRef}
+              className="relative w-full rounded-[24px] overflow-hidden shadow-card select-none cursor-col-resize border border-line"
+              style={{ aspectRatio: '4/3' }}
+              onMouseDown={onSliderMouseDown}
+              onTouchStart={onSliderMouseDown}
+            >
+              <img
+                src={originalImage}
+                alt="Before"
+                className="absolute inset-0 w-full h-full object-contain bg-neutral-100"
+                style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
+                draggable={false}
+              />
+              <img
+                src={resultImage}
+                alt="After"
+                className="absolute inset-0 w-full h-full object-contain bg-white"
+                style={{ clipPath: `inset(0 0 0 ${sliderPos}%)` }}
+                draggable={false}
+              />
+              <div
+                className="absolute top-0 bottom-0 w-0.5 bg-white shadow-lg"
+                style={{ left: `${sliderPos}%` }}
+              >
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 bg-white rounded-full shadow-card flex items-center justify-center border border-line">
+                  <svg className="w-4 h-4 text-ink-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l-4 3 4 3M16 9l4 3-4 3" />
+                  </svg>
                 </div>
               </div>
-              <span className="absolute top-3 left-3 text-white text-xs font-semibold bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded-full">Original</span>
-              <span className="absolute top-3 right-3 text-white text-xs font-semibold backdrop-blur-sm px-2.5 py-1 rounded-full" style={{ background: 'rgba(124,58,237,0.7)' }}>Edited ✦</span>
+              <span className="absolute top-3 left-3 text-white text-xs font-semibold bg-black/50 backdrop-blur-sm px-2.5 py-1 rounded-full">
+                Original
+              </span>
+              <span
+                className="absolute top-3 right-3 text-white text-xs font-semibold backdrop-blur-sm px-2.5 py-1 rounded-full"
+                style={{ background: 'rgba(124,58,237,0.75)' }}
+              >
+                Edited ✦
+              </span>
             </div>
 
             <div className="flex flex-wrap gap-3 justify-center">
-              <a href={resultImage} download="ai-edited.jpg" target="_blank" rel="noreferrer"
-                className="flex items-center gap-2 text-white px-8 py-3 rounded-full font-semibold text-sm hover:scale-[1.03] active:scale-95 transition-all shadow-lg"
-                style={{ background: activeTab.gradient, boxShadow: activeTab.shadow }}
+              <a
+                href={resultImage}
+                download="ai-edited.jpg"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex"
               >
-                <Download className="w-4 h-4" /> Download
+                <Button
+                  variant={activeTab.theme}
+                  size="lg"
+                  icon={Download}
+                >
+                  Download
+                </Button>
               </a>
-              <button onClick={reset} className="flex items-center gap-2 border border-black/[0.10] text-[#6e6e73] px-6 py-3 rounded-full text-sm hover:text-[#1d1d1f] hover:border-black/[0.2] transition-all">
-                <RotateCcw className="w-3.5 h-3.5" /> Try Another
-              </button>
+              <Button
+                onClick={reset}
+                variant="secondary"
+                size="lg"
+                icon={RotateCcw}
+              >
+                Try Another
+              </Button>
             </div>
           </motion.div>
         )}
@@ -302,4 +392,3 @@ const AiEditor = () => {
 }
 
 export default AiEditor
-

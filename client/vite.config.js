@@ -18,6 +18,7 @@ export default defineConfig({
       '@gsap/react',
       'lenis/react',
       'framer-motion',
+      'next-themes',
       'react-router-dom',
       'axios',
       'react-toastify'

@@ -3,28 +3,10 @@ import { AppContext } from '../context/AppContext'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Focus, Sparkles, Upload, Download, RotateCcw, RefreshCw, Zap, Sliders } from 'lucide-react'
 
-// Grain texture overlay matching existing theme
-const GrainOverlay = () => (
-  <div
-    className="absolute inset-0 pointer-events-none opacity-[0.035] mix-blend-overlay rounded-[20px]"
-    style={{
-      backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
-    }}
-  />
-)
-
-// Sapphire / Cyan Theme Orb
-const ThemeOrb = ({ icon: Icon }) => (
-  <div
-    className="relative w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-transform duration-300 hover:scale-105 shadow-[0_8px_18px_-2px_rgba(2,132,199,0.45)]"
-    style={{
-      background: 'radial-gradient(circle at 35% 30%, #38bdf8 0%, #0284c7 55%, #0369a1 100%)',
-    }}
-  >
-    <div className="absolute top-1.5 left-2 w-3.5 h-2 rounded-full bg-white/45 blur-[0.5px] -rotate-45 pointer-events-none" />
-    <Icon className="w-5 h-5 text-white z-10 stroke-[2]" />
-  </div>
-)
+import GrainOverlay from '../components/ui/GrainOverlay'
+import ThemeOrb from '../components/ui/ThemeOrb'
+import Button from '../components/ui/Button'
+import { Card, CardInner, PageHeader } from '../components/ui/Card'
 
 const UNBLUR_MODES = [
   {
@@ -173,13 +155,14 @@ const Unblur = () => {
             transition={{ duration: 0.4 }}
             className="w-full max-w-[580px]"
           >
-            <div className="bg-white rounded-[24px] border border-[#e5e5e7] p-2.5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_36px_rgba(0,0,0,0.07)] transition-all duration-300">
-              <div
+            <Card>
+              <CardInner
+                dashed
                 onClick={() => fileInputRef.current?.click()}
                 onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
                 onDragLeave={() => setDragOver(false)}
                 onDrop={onDrop}
-                className={`relative rounded-[20px] border border-dashed p-7 sm:p-9 cursor-pointer transition-all duration-300 flex flex-col items-center justify-center min-h-[260px] sm:min-h-[290px] overflow-hidden select-none ${
+                className={`cursor-pointer flex flex-col items-center justify-center min-h-[260px] sm:min-h-[290px] select-none ${
                   dragOver
                     ? 'border-sky-500 bg-sky-100/60 ring-4 ring-sky-500/10'
                     : 'border-sky-300/80 hover:border-sky-400 hover:bg-sky-50/40'
@@ -203,10 +186,10 @@ const Unblur = () => {
                   <Upload className="w-6 h-6 text-sky-600" />
                 </div>
 
-                <p className="text-sm sm:text-base font-semibold text-[#1d1d1f]">
+                <p className="text-sm sm:text-base font-semibold text-ink font-primary">
                   Drop your blurry photo here, or <span className="text-sky-600 underline">browse</span>
                 </p>
-                <p className="text-xs text-[#86868b] mt-1.5">
+                <p className="text-xs text-ink-muted mt-1.5 font-sans">
                   Supports JPG, PNG, WEBP • Up to 25MB
                 </p>
 
@@ -215,14 +198,14 @@ const Unblur = () => {
                   {['Camera Shake', 'Out of Focus', 'Motion Blur', 'Facial Softness'].map((tag) => (
                     <span
                       key={tag}
-                      className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-white border border-[#e5e5e7] text-[#6e6e73]"
+                      className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-white border border-line text-ink-muted font-sans"
                     >
                       ✓ {tag}
                     </span>
                   ))}
                 </div>
-              </div>
-            </div>
+              </CardInner>
+            </Card>
           </motion.div>
         )}
 
@@ -358,15 +341,16 @@ const Unblur = () => {
             {/* ── Action Buttons ── */}
             <div className="flex flex-wrap items-center justify-center gap-2.5 w-full">
               {!resultImage ? (
-                <button
-                  type="button"
+                <Button
+                  variant="sky"
+                  size="md"
                   disabled={loading}
+                  loading={loading}
+                  icon={!loading ? Sparkles : undefined}
                   onClick={onSubmit}
-                  className="px-6 py-2.5 rounded-full bg-[#1d1d1f] hover:bg-[#333336] text-white text-xs sm:text-sm font-semibold shadow-sm hover:shadow-md transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Sparkles className="w-4 h-4 text-sky-400" />
                   Unblur Image (1 Credit)
-                </button>
+                </Button>
               ) : (
                 <>
                   <a
@@ -374,31 +358,31 @@ const Unblur = () => {
                     download="imagod-unblurred.jpg"
                     target="_blank"
                     rel="noreferrer"
-                    className="px-5 py-2.5 rounded-full bg-sky-600 hover:bg-sky-500 text-white text-xs sm:text-sm font-semibold shadow-sm transition-all flex items-center gap-1.5"
+                    className="inline-flex items-center justify-center font-primary font-semibold select-none cursor-pointer transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-1 px-5 py-2.5 rounded-full bg-sky-600 hover:bg-sky-500 text-white text-xs sm:text-sm shadow-xs gap-1.5"
                   >
                     <Download className="w-4 h-4" />
-                    Download Crisp HD
+                    <span>Download Crisp HD</span>
                   </a>
-                  <button
-                    type="button"
+                  <Button
+                    variant="secondary"
+                    size="md"
                     disabled={loading}
+                    icon={RefreshCw}
                     onClick={onSubmit}
-                    className="px-4 py-2.5 rounded-full bg-white hover:bg-[#f5f5f7] border border-[#e5e5e7] text-[#1d1d1f] text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5"
                   >
-                    <RefreshCw className="w-4 h-4 text-sky-600" />
                     Re-run Mode
-                  </button>
+                  </Button>
                 </>
               )}
 
-              <button
-                type="button"
+              <Button
+                variant="ghost"
+                size="md"
+                icon={RotateCcw}
                 onClick={reset}
-                className="px-4 py-2.5 rounded-full bg-white hover:bg-[#f5f5f7] border border-[#e5e5e7] text-[#6e6e73] hover:text-[#1d1d1f] text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5"
               >
-                <RotateCcw className="w-4 h-4" />
                 Upload Another
-              </button>
+              </Button>
             </div>
           </motion.div>
         )}

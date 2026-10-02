@@ -13,9 +13,9 @@ if (typeof window !== 'undefined') {
 // Configuration block for hero scroll scrubbing & pipeline integration
 const CONFIG = {
   FRAME_COUNT: 270, // Merged Hero 2 (0-170) -> Hero 3 (171-269)
-  PIN_HEIGHT: '650vh', // Generous scroll runway for video scrubbing + alternating pipeline journey
-  SCRUB: 0.5,
-  VIDEO_END_PROGRESS: 0.42, // Video completes at 0.42, then locks at frame 269 while Pipeline scrolls in blank space
+  PIN_HEIGHT: '950vh', // Generous scroll runway for video scrubbing + alternating pipeline journey
+  SCRUB: 1.2, // Smooth, liquid inertia scrub catches up in 1.2s to prevent fast jumps
+  VIDEO_END_PROGRESS: 0.54, // Video completes at 0.54 (~510vh), giving plenty of room for smooth, noticeable transitions
 }
 
 // Complete feature suite for vertical marquee
@@ -305,7 +305,7 @@ const VideoHero = () => {
           if (!rafScheduledRef.current) {
             rafScheduledRef.current = true
             requestAnimationFrame(() => {
-              renderFrame(frameIndex)
+              renderFrame(currentFrameRef.current)
               rafScheduledRef.current = false
             })
           }
@@ -318,31 +318,31 @@ const VideoHero = () => {
     }
   }, [prefersReducedMotion, renderFrame])
 
-  // Narrative Text Scenes during Hero 2 and initial Hero 3 (0.00 to 0.42)
-  // Scene 1: 0.00 - 0.15 (Initial hero state + Marquee)
+  // Narrative Text Scenes during Hero 2 and initial Hero 3 (0.00 to 0.54)
+  // Scene 1: 0.00 - 0.20 (Initial hero state + Marquee) - held steady longer for noticeable reading
   const scene1 = prefersReducedMotion
     ? { opacity: 1, translateY: 0 }
-    : getSceneTransform(scrollProgress, 0.0, 0.0, 0.11, 0.16)
+    : getSceneTransform(scrollProgress, 0.0, 0.0, 0.14, 0.20)
 
-  // Scene 2: 0.16 - 0.28 (From idea to finished artwork)
+  // Scene 2: 0.20 - 0.36 (From idea to finished artwork)
   const scene2 = prefersReducedMotion
     ? { opacity: 0, translateY: 20 }
-    : getSceneTransform(scrollProgress, 0.16, 0.20, 0.26, 0.29)
+    : getSceneTransform(scrollProgress, 0.20, 0.24, 0.32, 0.36)
 
-  // Scene 3: 0.29 - 0.41 (Razor-sharp fine detail zooming into eye)
+  // Scene 3: 0.36 - 0.53 (Razor-sharp fine detail zooming into eye)
   const scene3 = prefersReducedMotion
     ? { opacity: 0, translateY: 20 }
-    : getSceneTransform(scrollProgress, 0.29, 0.33, 0.38, 0.41)
+    : getSceneTransform(scrollProgress, 0.36, 0.40, 0.49, 0.53)
 
-  // CREATION PIPELINE SCRUB (Starts at 0.42 right as Hero 3 completes zoom out)
+  // CREATION PIPELINE SCRUB (Starts at 0.54 right as Hero completes zoom out into profile)
   const pipelineOpacity = prefersReducedMotion
     ? 1
-    : Math.min(1, Math.max(0, (scrollProgress - 0.41) / 0.03))
+    : Math.min(1, Math.max(0, (scrollProgress - 0.52) / 0.03))
 
-  // Horizontal travel progress across the blank space (0.44 to 0.95)
+  // Horizontal travel progress across the blank space (0.55 to 0.96)
   const pipelineT = prefersReducedMotion
     ? 1
-    : Math.min(1, Math.max(0, (scrollProgress - 0.44) / (0.95 - 0.44)))
+    : Math.min(1, Math.max(0, (scrollProgress - 0.55) / (0.96 - 0.55)))
 
   // Current horizontal translation of the pipeline slider
   const pipelineTranslateX = -pipelineT * maxTrackShift
@@ -356,7 +356,7 @@ const VideoHero = () => {
   // Interactive jump to any phase on click
   const handlePhaseClick = useCallback((index) => {
     if (!containerRef.current) return
-    const targetProgress = 0.44 + (index / (PIPELINE_PHASES.length - 0.5)) * 0.51
+    const targetProgress = 0.55 + (index / (PIPELINE_PHASES.length - 0.5)) * (0.96 - 0.55)
     const totalScrollable = containerRef.current.offsetHeight - window.innerHeight
     window.scrollTo({
       top: targetProgress * totalScrollable,

@@ -2,30 +2,11 @@ import React, { useContext, useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
-import SoftGradientBackground from '../components/SoftGradientBackground'
-
-// Grain texture overlay matching BuyCredit.jsx & Usage.jsx
-const GrainOverlay = () => (
-  <div
-    className='absolute inset-0 pointer-events-none opacity-[0.035] mix-blend-overlay rounded-[20px]'
-    style={{
-      backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-    }}
-  />
-)
-
-// Blue Theme Orb matching BuyCredit.jsx AvatarOrb style
-const ThemeOrb = ({ icon: Icon }) => (
-  <div
-    className='relative w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-transform duration-300 hover:scale-105 shadow-[0_8px_18px_-2px_rgba(37,99,235,0.40)]'
-    style={{
-      background: 'radial-gradient(circle at 35% 30%, #93c5fd 0%, #3b82f6 55%, #1d4ed8 100%)',
-    }}
-  >
-    <div className='absolute top-1.5 left-2 w-3.5 h-2 rounded-full bg-white/45 blur-[0.5px] -rotate-45 pointer-events-none' />
-    <Icon className='w-5 h-5 text-white z-10 stroke-[2]' />
-  </div>
-)
+import GrainOverlay from '../components/ui/GrainOverlay'
+import ThemeOrb from '../components/ui/ThemeOrb'
+import Button from '../components/ui/Button'
+import { Card, CardInner } from '../components/ui/Card'
+import { Sparkles, Wand2, Download, Maximize2, Copy, Check, RotateCcw, Send } from 'lucide-react'
 
 const STYLES = [
   { id: 'natural', label: 'Natural / Raw', icon: '✨', suffix: '' },
@@ -87,7 +68,7 @@ export default function Result() {
     }
   }, [messages, loading])
 
-  // Prepopulate from navigation state (e.g. from Hero flip cards)
+  // Prepopulate from navigation state
   useEffect(() => {
     if (location.state?.initialPrompt) {
       setInput(location.state.initialPrompt)
@@ -198,12 +179,9 @@ export default function Result() {
 
   return (
     <div className='relative w-full h-[100dvh] overflow-hidden select-none flex flex-col items-center justify-between bg-[#fafafc]'>
-
       {/* Main Studio Wrapper */}
       <div className='relative z-10 w-full max-w-3xl h-full flex flex-col justify-between min-h-0 pt-20 sm:pt-24 pb-5 px-3 sm:px-6'>
-
-
-
+        
         {/* ── CHAT FEED CONTAINER ── */}
         <div
           ref={chatContainerRef}
@@ -213,51 +191,45 @@ export default function Result() {
             /* Empty State: Themed Signature Card */
             <div className='h-full flex flex-col items-center justify-center text-center px-2 sm:px-4 py-4'>
               <motion.div
-                initial={{ opacity: 0, scale: 0.96 }}
+                initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.4 }}
-                className='w-full max-w-[560px] bg-white rounded-[26px] border border-[#e5e5e7] p-3 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_36px_rgba(0,0,0,0.07)] transition-all'
+                className='w-full max-w-[560px]'
               >
-                <div
-                  className='rounded-[20px] p-6 sm:p-8 relative overflow-hidden border border-blue-200 flex flex-col items-center'
-                  style={{
-                    background: 'linear-gradient(180deg, #dbeafe 0%, #eff6ff 45%, #ffffff 100%)',
-                  }}
-                >
-                  <GrainOverlay />
+                <Card>
+                  <CardInner
+                    className='p-6 sm:p-8 flex flex-col items-center border-blue-200'
+                    style={{
+                      background: 'linear-gradient(180deg, #dbeafe 0%, #eff6ff 45%, #ffffff 100%)',
+                    }}
+                  >
+                    <div className='relative z-10 mb-4'>
+                      <ThemeOrb theme="blue" icon={Wand2} />
+                    </div>
 
-                  <div className='relative z-10 mb-4'>
-                    <ThemeOrb
-                      icon={() => (
-                        <svg className='w-5 h-5 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                          <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M13 10V3L4 14h7v7l9-11h-7z' />
-                        </svg>
-                      )}
-                    />
-                  </div>
+                    <h2 className='text-2xl sm:text-3xl font-bold font-primary text-ink tracking-tight relative z-10'>
+                      What will you imagine today?
+                    </h2>
+                    <p className='text-xs sm:text-sm font-body text-ink-muted mt-2 max-w-sm mx-auto leading-relaxed relative z-10'>
+                      Type your creative prompt below to synthesize high-resolution imagery with lighting & texture details.
+                    </p>
 
-                  <h2 className='text-2xl sm:text-3xl font-bold text-ink tracking-tight relative z-10'>
-                    What will you imagine today?
-                  </h2>
-                  <p className='text-xs sm:text-sm text-[#6e6e73] mt-2 max-w-sm mx-auto leading-relaxed relative z-10'>
-                    Type your creative prompt below to synthesize high-resolution imagery with lighting & texture details.
-                  </p>
-
-                  {/* Quick Inspiration Prompts Grid */}
-                  <div className='grid grid-cols-1 sm:grid-cols-2 gap-2 mt-5 w-full relative z-10'>
-                    {CURATED_PROMPTS.slice(0, 4).map((prompt, idx) => (
-                      <button
-                        key={idx}
-                        type='button'
-                        onClick={() => handleSendMessage(prompt)}
-                        className='p-3 rounded-[14px] bg-white/80 hover:bg-white border border-blue-200/80 shadow-2xs hover:shadow-xs text-left text-xs text-neutral-800 transition-all flex items-start gap-2 group cursor-pointer'
-                      >
-                        <span className='text-blue-500 font-bold'>↳</span>
-                        <span className='line-clamp-2 leading-snug'>{prompt}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                    {/* Quick Inspiration Prompts Grid */}
+                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-2 mt-5 w-full relative z-10'>
+                      {CURATED_PROMPTS.slice(0, 4).map((prompt, idx) => (
+                        <button
+                          key={idx}
+                          type='button'
+                          onClick={() => handleSendMessage(prompt)}
+                          className='p-3 rounded-input bg-white/85 hover:bg-white border border-blue-200/80 shadow-2xs hover:shadow-xs text-left text-xs font-body text-neutral-800 transition-all flex items-start gap-2 group cursor-pointer active:scale-[0.99]'
+                        >
+                          <span className='text-blue-500 font-bold'>↳</span>
+                          <span className='line-clamp-2 leading-snug'>{prompt}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </CardInner>
+                </Card>
               </motion.div>
             </div>
           ) : (
@@ -267,7 +239,7 @@ export default function Result() {
                 {msg.role === 'user' ? (
                   /* User Prompt Bubble */
                   <div className='flex justify-end mb-1'>
-                    <div className='max-w-[85%] sm:max-w-md bg-neutral-900 text-white rounded-2xl rounded-tr-xs px-4 py-2.5 shadow-sm text-sm'>
+                    <div className='max-w-[85%] sm:max-w-md bg-neutral-900 text-white rounded-2xl rounded-tr-xs px-4 py-2.5 shadow-sm text-sm font-body'>
                       <p className='leading-relaxed'>{msg.content}</p>
                       {(msg.style || msg.ratio) && (
                         <div className='mt-1.5 pt-1.5 border-t border-white/10 flex items-center gap-2 text-[10px] text-neutral-400'>
@@ -278,15 +250,14 @@ export default function Result() {
                     </div>
                   </div>
                 ) : (
-                  /* AI Response: "AI Chat Image Generation" Component */
+                  /* AI Response */
                   <div className='flex items-start gap-2.5 mb-2'>
                     <div className='w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 text-xs font-bold shadow-xs mt-0.5'>
                       ✦
                     </div>
 
                     <div className='flex-1 max-w-[90%] sm:max-w-md flex flex-col items-start'>
-                      {/* State Title: "Image created." matching 21st.dev component */}
-                      <p className='text-xs font-medium text-neutral-700 mb-1.5 flex items-center gap-1.5'>
+                      <p className='text-xs font-medium font-body text-ink-muted mb-1.5 flex items-center gap-1.5'>
                         {msg.status === 'loading' ? (
                           <>
                             <span className='w-2 h-2 rounded-full bg-blue-500 animate-ping' />
@@ -303,7 +274,7 @@ export default function Result() {
                       <div
                         className={`relative w-full ${
                           msg.ratioClass || 'aspect-square'
-                        } max-h-[46vh] rounded-2xl bg-white/90 backdrop-blur-md border border-white/80 shadow-[0_8px_30px_rgba(0,0,0,0.06)] overflow-hidden flex items-center justify-center group`}
+                        } max-h-[46vh] rounded-card-inner bg-white/90 backdrop-blur-md border border-line shadow-card overflow-hidden flex items-center justify-center group`}
                       >
                         {msg.status === 'loading' ? (
                           /* Shimmer Generating State */
@@ -333,37 +304,31 @@ export default function Result() {
                               <button
                                 type='button'
                                 onClick={() => setLightboxImage(msg.image)}
-                                className='p-2 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md text-white transition-all shadow-md'
+                                className='p-2 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md text-white transition-all shadow-md active:scale-95 cursor-pointer'
                                 title='Preview Fullscreen'
                               >
-                                <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4' />
-                                </svg>
+                                <Maximize2 className='w-3.5 h-3.5' />
                               </button>
 
                               <a
                                 href={msg.image}
                                 download={`imagod-${Date.now()}.png`}
-                                className='p-2 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md text-white transition-all shadow-md'
+                                className='p-2 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md text-white transition-all shadow-md active:scale-95 cursor-pointer'
                                 title='Download Image'
                               >
-                                <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4' />
-                                </svg>
+                                <Download className='w-3.5 h-3.5' />
                               </a>
 
                               <button
                                 type='button'
                                 onClick={() => handleCopyPrompt(msg.id, msg.prompt)}
-                                className='p-2 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md text-white transition-all shadow-md'
+                                className='p-2 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md text-white transition-all shadow-md active:scale-95 cursor-pointer'
                                 title='Copy Prompt'
                               >
                                 {copiedId === msg.id ? (
-                                  <span className='text-[10px] text-emerald-400 font-bold px-0.5'>✓</span>
+                                  <Check className='w-3.5 h-3.5 text-emerald-400' />
                                 ) : (
-                                  <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z' />
-                                  </svg>
+                                  <Copy className='w-3.5 h-3.5' />
                                 )}
                               </button>
                             </div>
@@ -378,9 +343,9 @@ export default function Result() {
           )}
         </div>
 
-        {/* ── BOTTOM DOCKED "AI CHAT INPUT" BAR ── */}
+        {/* ── BOTTOM DOCKED AI CHAT INPUT BAR ── */}
         <div className='w-full shrink-0 pt-2'>
-          <div className='w-full relative bg-white border border-[#e5e5e7] rounded-[24px] shadow-[0_4px_24px_rgba(0,0,0,0.06)] focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500/50 transition-all'>
+          <div className='w-full relative bg-white border border-line rounded-card shadow-card focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/50 transition-all'>
             
             {/* Top Prompt Input Area */}
             <div className='p-3.5 pb-1 flex items-start gap-2'>
@@ -392,12 +357,12 @@ export default function Result() {
                 placeholder='Ask AI to generate an image… (Enter to send)'
                 disabled={loading}
                 rows={1}
-                className='w-full bg-transparent resize-none text-sm text-neutral-800 outline-none placeholder-neutral-400 placeholder:font-light leading-relaxed max-h-24'
+                className='w-full bg-transparent resize-none text-sm font-body text-ink outline-none placeholder-ink-muted/60 leading-relaxed max-h-24'
               />
             </div>
 
             {/* Bottom Integrated Controls */}
-            <div className='px-3.5 pb-3 pt-1 flex items-center justify-between gap-2 border-t border-black/[0.04] select-none'>
+            <div className='px-3.5 pb-3 pt-1 flex items-center justify-between gap-2 border-t border-line/60 select-none'>
               
               {/* Left Controls: Style Pill + Aspect Ratio + Surprise Me */}
               <div className='flex items-center gap-1.5 flex-wrap'>
@@ -407,18 +372,18 @@ export default function Result() {
                   <button
                     type='button'
                     onClick={() => setStyleDropdownOpen(!styleDropdownOpen)}
-                    className='inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/60 hover:bg-white/90 border border-black/[0.04] text-neutral-700 text-xs font-medium transition-colors'
+                    className='inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-neutral-100 hover:bg-neutral-200/80 border border-line text-ink text-xs font-medium transition-colors cursor-pointer'
                   >
                     <span>{activeStyle?.icon}</span>
                     <span className='truncate max-w-[85px] sm:max-w-none'>{activeStyle?.label}</span>
-                    <svg className='w-3 h-3 text-neutral-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <svg className='w-3 h-3 text-ink-muted' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                       <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
                     </svg>
                   </button>
 
                   {styleDropdownOpen && (
                     <div
-                      className='absolute bottom-full left-0 mb-2 w-48 bg-white/95 backdrop-blur-xl border border-black/[0.08] rounded-xl shadow-xl p-1 z-50'
+                      className='absolute bottom-full left-0 mb-2 w-48 bg-white/95 backdrop-blur-xl border border-line rounded-card-inner shadow-card-hover p-1 z-50'
                       onMouseLeave={() => setStyleDropdownOpen(false)}
                     >
                       {STYLES.map((style) => (
@@ -429,7 +394,7 @@ export default function Result() {
                             setSelectedStyle(style.id)
                             setStyleDropdownOpen(false)
                           }}
-                          className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors text-left ${
+                          className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors text-left cursor-pointer ${
                             selectedStyle === style.id
                               ? 'bg-neutral-900 text-white'
                               : 'text-neutral-700 hover:bg-neutral-100'
@@ -444,16 +409,16 @@ export default function Result() {
                 </div>
 
                 {/* Aspect Ratio Toggle */}
-                <div className='hidden sm:flex items-center gap-0.5 bg-white/60 border border-black/[0.04] p-0.5 rounded-full'>
+                <div className='hidden sm:flex items-center gap-0.5 bg-neutral-100/80 border border-line p-0.5 rounded-full'>
                   {ASPECT_RATIOS.map((ratio) => (
                     <button
                       key={ratio.id}
                       type='button'
                       onClick={() => setSelectedRatio(ratio.id)}
-                      className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium transition-all ${
+                      className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium transition-all cursor-pointer ${
                         selectedRatio === ratio.id
-                          ? 'bg-neutral-900 text-white shadow-2xs'
-                          : 'text-neutral-500 hover:text-neutral-800'
+                          ? 'bg-neutral-900 text-white shadow-2xs font-semibold'
+                          : 'text-ink-muted hover:text-ink'
                       }`}
                     >
                       {ratio.label}
@@ -466,12 +431,10 @@ export default function Result() {
                   type='button'
                   onClick={handleRandomPrompt}
                   disabled={loading}
-                  className='p-1.5 text-neutral-400 hover:text-neutral-700 hover:bg-white/80 rounded-full transition-colors'
+                  className='p-1.5 text-ink-muted hover:text-ink hover:bg-neutral-100 rounded-full transition-colors cursor-pointer'
                   title='Random Prompt Idea'
                 >
-                  <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                    <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={1.8} d='M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15' />
-                  </svg>
+                  <Sparkles className='w-4 h-4' />
                 </button>
               </div>
 
@@ -481,7 +444,7 @@ export default function Result() {
                   <button
                     type='button'
                     onClick={() => setMessages([])}
-                    className='text-[11px] text-neutral-400 hover:text-neutral-700 transition-colors px-1.5 py-0.5'
+                    className='text-[11px] text-ink-muted hover:text-ink transition-colors px-1.5 py-0.5 cursor-pointer font-medium'
                   >
                     Reset
                   </button>
@@ -490,15 +453,13 @@ export default function Result() {
                   type='button'
                   onClick={() => handleSendMessage()}
                   disabled={loading || !input.trim()}
-                  className='w-8 h-8 rounded-full bg-neutral-900 hover:bg-black text-white flex items-center justify-center transition-all hover:scale-105 active:scale-95 disabled:opacity-30 disabled:hover:scale-100 cursor-pointer disabled:cursor-not-allowed shadow-xs'
+                  className='w-8 h-8 rounded-full bg-primary hover:bg-primary-focus text-white flex items-center justify-center transition-all hover:scale-105 active:scale-95 disabled:opacity-30 disabled:hover:scale-100 cursor-pointer disabled:cursor-not-allowed shadow-xs'
                   title='Send Prompt (Enter)'
                 >
                   {loading ? (
                     <div className='w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin' />
                   ) : (
-                    <svg className='w-3.5 h-3.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-                      <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2.2} d='M5 12h14M12 5l7 7-7 7' />
-                    </svg>
+                    <Send className='w-3.5 h-3.5' />
                   )}
                 </button>
               </div>
@@ -522,7 +483,7 @@ export default function Result() {
             <button
               type='button'
               onClick={() => setLightboxImage(null)}
-              className='absolute top-6 right-6 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors'
+              className='absolute top-6 right-6 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer'
             >
               <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                 <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
@@ -542,9 +503,11 @@ export default function Result() {
                 <a
                   href={lightboxImage}
                   download={`imagod-${Date.now()}.png`}
-                  className='px-5 py-2 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium transition-colors shadow-md'
+                  className='inline-flex'
                 >
-                  Download Master (PNG)
+                  <Button variant='primary' size='sm' icon={Download}>
+                    Download Master (PNG)
+                  </Button>
                 </a>
               </div>
             </div>

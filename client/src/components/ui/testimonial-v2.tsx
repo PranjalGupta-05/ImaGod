@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 // --- Types ---
 export interface Testimonial {
@@ -87,18 +87,22 @@ export const TestimonialsColumn = (props: {
   testimonials: Testimonial[];
   duration?: number;
 }) => {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
     <div className={props.className}>
       <motion.ul
-        animate={{
-          translateY: "-50%",
-        }}
-        transition={{
-          duration: props.duration || 16,
-          repeat: Infinity,
-          ease: "linear",
-          repeatType: "loop",
-        }}
+        animate={shouldReduceMotion ? { translateY: "0%" } : { translateY: "-50%" }}
+        transition={
+          shouldReduceMotion
+            ? { duration: 0 }
+            : {
+                duration: props.duration || 18,
+                repeat: Infinity,
+                ease: "linear",
+                repeatType: "loop",
+              }
+        }
         className="flex flex-col gap-6 pb-6 bg-transparent list-none m-0 p-0"
       >
         {[
@@ -109,19 +113,19 @@ export const TestimonialsColumn = (props: {
                   key={`${index}-${i}`}
                   aria-hidden={index === 1 ? "true" : "false"}
                   tabIndex={index === 1 ? -1 : 0}
-                  whileHover={{ 
+                  whileHover={shouldReduceMotion ? {} : { 
                     scale: 1.02,
                     y: -6,
                     boxShadow: "0 20px 40px -12px rgba(0, 0, 0, 0.08), 0 8px 16px -6px rgba(0, 0, 0, 0.03), 0 0 0 1px rgba(0, 0, 0, 0.06)",
                     transition: { type: "spring", stiffness: 400, damping: 20 }
                   }}
-                  whileFocus={{ 
+                  whileFocus={shouldReduceMotion ? {} : { 
                     scale: 1.02,
                     y: -6,
                     boxShadow: "0 20px 40px -12px rgba(0, 0, 0, 0.08), 0 8px 16px -6px rgba(0, 0, 0, 0.03), 0 0 0 1px rgba(0, 0, 0, 0.06)",
                     transition: { type: "spring", stiffness: 400, damping: 20 }
                   }}
-                  className="p-8 sm:p-9 rounded-3xl border border-neutral-200/80 shadow-md shadow-black/[0.03] max-w-sm w-full bg-white transition-all duration-300 cursor-default select-none group focus:outline-none focus:ring-2 focus:ring-blue-500/30" 
+                  className="p-8 sm:p-9 rounded-card border border-line shadow-card max-w-sm w-full bg-white transition-all duration-300 cursor-default select-none group focus:outline-none focus:ring-2 focus:ring-primary/20" 
                 >
                   <blockquote className="m-0 p-0 flex flex-col justify-between h-full">
                     <div>
@@ -134,25 +138,25 @@ export const TestimonialsColumn = (props: {
                         ))}
                       </div>
 
-                      <p className="text-neutral-600 text-[15px] leading-relaxed font-normal m-0">
+                      <p className="text-ink-muted text-[15px] leading-relaxed font-normal font-body m-0">
                         "{text}"
                       </p>
                     </div>
 
-                    <footer className="flex items-center gap-3 mt-6 pt-4 border-t border-neutral-100">
+                    <footer className="flex items-center gap-3 mt-6 pt-4 border-t border-line">
                       <img
                         width={40}
                         height={40}
                         src={image}
                         alt={`Avatar of ${name}`}
-                        className="h-10 w-10 rounded-full object-cover ring-2 ring-neutral-100 group-hover:ring-blue-500/30 transition-all duration-300 ease-in-out"
+                        className="h-10 w-10 rounded-full object-cover ring-2 ring-neutral-100 group-hover:ring-primary/20 transition-all duration-300 ease-in-out"
                         loading="lazy"
                       />
                       <div className="flex flex-col text-left">
-                        <cite className="font-semibold not-italic tracking-tight text-[15px] leading-snug text-neutral-900">
+                        <cite className="font-semibold not-italic tracking-tight text-[15px] leading-snug font-primary text-ink">
                           {name}
                         </cite>
-                        <span className="text-xs leading-tight tracking-tight text-neutral-500 mt-0.5">
+                        <span className="text-xs leading-tight tracking-tight font-body text-ink-muted mt-0.5">
                           {role}
                         </span>
                       </div>
@@ -168,8 +172,10 @@ export const TestimonialsColumn = (props: {
   );
 };
 
-// --- Testimonial-v2 Section (Light Mode by default) ---
+// --- Testimonial-v2 Section ---
 export default function TestimonialV2() {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
     <section 
       aria-labelledby="testimonials-heading"
@@ -179,29 +185,13 @@ export default function TestimonialV2() {
         
         {/* Header Stack */}
         <div className="flex flex-col items-center justify-center max-w-[640px] mx-auto mb-14 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-neutral-100/80 border border-neutral-200/80 text-neutral-600 text-[11px] sm:text-xs font-medium tracking-[0.08em] uppercase mb-4 shadow-xs font-sans"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            <span>Community Voice · 03</span>
-          </motion.div>
-
           <motion.h2 
             id="testimonials-heading" 
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            style={{
-              fontFamily: "'Poppins', sans-serif",
-              letterSpacing: '-0.025em',
-              lineHeight: 1.1,
-            }}
-            className="text-3xl sm:text-4xl lg:text-[46px] text-ink font-bold max-w-[760px] mx-auto font-primary text-center"
+            transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="text-3xl sm:text-4xl lg:text-[46px] text-ink font-bold max-w-[760px] mx-auto font-primary text-center tracking-tight leading-tight"
           >
             Loved by creators <span className="text-primary font-bold">worldwide</span>
           </motion.h2>
@@ -210,8 +200,8 @@ export default function TestimonialV2() {
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-center mt-3.5 text-neutral-500 text-base sm:text-lg leading-relaxed max-w-lg font-normal font-sans"
+            transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            className="text-center mt-3.5 text-ink-muted text-base sm:text-lg leading-relaxed max-w-lg font-normal font-body"
           >
             See what designers, art directors, and creative studios accomplish with ImaGod.
           </motion.p>
@@ -223,9 +213,9 @@ export default function TestimonialV2() {
           role="region"
           aria-label="Scrolling Testimonials"
         >
-          <TestimonialsColumn testimonials={firstColumn} duration={16} />
-          <TestimonialsColumn testimonials={secondColumn} className="hidden md:block" duration={20} />
-          <TestimonialsColumn testimonials={thirdColumn} className="hidden lg:block" duration={18} />
+          <TestimonialsColumn testimonials={firstColumn} duration={18} />
+          <TestimonialsColumn testimonials={secondColumn} className="hidden md:block" duration={22} />
+          <TestimonialsColumn testimonials={thirdColumn} className="hidden lg:block" duration={20} />
         </div>
 
       </div>

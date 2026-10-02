@@ -4,67 +4,11 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import axios from 'axios'
-
-// Avatar Orb matching the Pricing 6 design
-const AvatarOrb = ({ theme }) => {
-  const configs = {
-    blue: {
-      gradient: 'radial-gradient(circle at 35% 30%, #93c5fd 0%, #3b82f6 55%, #1d4ed8 100%)',
-      shadow: '0 8px 18px -2px rgba(37,99,235,0.40)',
-      eyeColor: '#0a2540',
-    },
-    purple: {
-      gradient: 'radial-gradient(circle at 35% 30%, #d8b4fe 0%, #8b5cf6 55%, #6d28d9 100%)',
-      shadow: '0 8px 18px -2px rgba(139,92,246,0.40)',
-      eyeColor: '#270d4f',
-    },
-    gold: {
-      gradient: 'radial-gradient(circle at 35% 30%, #fde047 0%, #eab308 55%, #b45309 100%)',
-      shadow: '0 8px 18px -2px rgba(234,179,8,0.40)',
-      eyeColor: '#451a03',
-    },
-  }
-
-  const conf = configs[theme] || configs.blue
-
-  return (
-    <div
-      className='relative w-11 h-11 rounded-full flex items-center justify-center shrink-0 transition-transform duration-300 hover:scale-105'
-      style={{
-        background: conf.gradient,
-        boxShadow: conf.shadow,
-      }}
-    >
-      {/* Specular highlight */}
-      <div className='absolute top-1.5 left-2 w-3.5 h-2 rounded-full bg-white/45 blur-[0.5px] -rotate-45 pointer-events-none' />
-      {/* Two Eyes */}
-      <div className='flex items-center gap-1.5 mt-0.5 z-10'>
-        <div
-          className='w-1.5 h-2 rounded-full relative'
-          style={{ backgroundColor: conf.eyeColor }}
-        >
-          <div className='w-0.5 h-0.5 rounded-full bg-white absolute top-0.5 left-0.5' />
-        </div>
-        <div
-          className='w-1.5 h-2 rounded-full relative'
-          style={{ backgroundColor: conf.eyeColor }}
-        >
-          <div className='w-0.5 h-0.5 rounded-full bg-white absolute top-0.5 left-0.5' />
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// Grain texture overlay
-const GrainOverlay = () => (
-  <div
-    className='absolute inset-0 pointer-events-none opacity-[0.035] mix-blend-overlay rounded-[20px]'
-    style={{
-      backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-    }}
-  />
-)
+import GrainOverlay from '../components/ui/GrainOverlay'
+import ThemeOrb from '../components/ui/ThemeOrb'
+import Button from '../components/ui/Button'
+import { Card, CardInner } from '../components/ui/Card'
+import { Check } from 'lucide-react'
 
 const BuyCredit = () => {
   const { user, backendUrl, loadCreditsData, token, setShowLogin, credit } = useContext(AppContext)
@@ -153,7 +97,7 @@ const BuyCredit = () => {
   const teamPlans = [
     {
       id: 'Team-Starter',
-      planId: 'Advanced', // Maps to 500 credits or team tier
+      planId: 'Advanced',
       title: 'Team Starter',
       desc: 'Best for boutique agencies & marketing teams collaborating on visuals.',
       price: 50,
@@ -177,7 +121,7 @@ const BuyCredit = () => {
     },
     {
       id: 'Studio-Pro',
-      planId: 'Business', // Maps to 5000 credits tier
+      planId: 'Business',
       title: 'Studio Pro',
       desc: 'Our flagship studio tier configured for high-velocity creative teams.',
       price: 250,
@@ -317,10 +261,10 @@ const BuyCredit = () => {
           transition={{ duration: 0.4 }}
           className='mb-3 sm:mb-4'
         >
-          <h1 className='text-2xl sm:text-3xl lg:text-[34px] font-bold text-ink tracking-tight leading-tight'>
+          <h1 className='text-2xl sm:text-3xl lg:text-[34px] font-bold font-primary text-ink tracking-tight leading-tight'>
             Simple, transparent pricing
           </h1>
-          <p className='text-sm sm:text-base text-[#6e6e73] mt-1 max-w-[560px]'>
+          <p className='text-sm sm:text-base font-body text-ink-muted mt-1 max-w-[560px]'>
             No hidden fees. Choose the plan that works for you.
           </p>
         </motion.div>
@@ -335,27 +279,25 @@ const BuyCredit = () => {
             transition={{ duration: 0.35 }}
             className='grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6 items-stretch mb-0'
           >
-            {displayedPlans.map((plan, index) => {
+            {displayedPlans.map((plan) => {
               const isProcessing = processingPlan === plan.id
 
               return (
-                <div
+                <Card
                   key={plan.id}
-                  className='bg-white rounded-[24px] border border-[#e5e5e7] p-2.5 flex flex-col justify-between shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_36px_rgba(0,0,0,0.07)] transition-all duration-300'
+                  className='p-2.5 flex flex-col justify-between'
                 >
                   {/* Top Gradient Inset Box with Avatar Orb & Price */}
-                  <div
-                    className='rounded-[18px] p-4 sm:p-5 relative overflow-hidden border'
+                  <CardInner
+                    className='p-4 sm:p-5'
                     style={{
                       background: plan.gradientBg,
                       borderColor: plan.borderColor,
                     }}
                   >
-                    <GrainOverlay />
-
                     {/* Top Row: Avatar Orb + Optional Badge */}
                     <div className='flex items-center justify-between relative z-10'>
-                      <AvatarOrb theme={plan.theme} />
+                      <ThemeOrb theme={plan.theme} withEyes={true} />
                       {plan.badge && (
                         <span className='px-2.5 py-0.5 rounded-full bg-black/10 backdrop-blur-sm text-[11px] font-semibold text-ink'>
                           {plan.badge}
@@ -365,10 +307,10 @@ const BuyCredit = () => {
 
                     {/* Plan Title & Description */}
                     <div className='mt-3 relative z-10'>
-                      <h3 className='text-[19px] font-bold text-ink tracking-tight'>
+                      <h3 className='text-[19px] font-bold font-primary text-ink tracking-tight'>
                         {plan.title}
                       </h3>
-                      <p className='text-[12px] text-[#4b5563] mt-1 leading-relaxed min-h-[32px]'>
+                      <p className='text-[12px] font-body text-neutral-600 mt-1 leading-relaxed min-h-[32px]'>
                         {plan.desc}
                       </p>
                     </div>
@@ -376,18 +318,18 @@ const BuyCredit = () => {
                     {/* Price Block */}
                     <div className='mt-3 relative z-10'>
                       <div className='flex items-baseline gap-2'>
-                        <span className='text-[32px] font-bold text-ink tracking-tight leading-none'>
+                        <span className='text-[32px] font-bold font-primary text-ink tracking-tight leading-none'>
                           {typeof plan.price === 'number' ? `$${plan.price}` : plan.price}
                         </span>
                         {plan.anchorPrice && (
-                          <span className='text-[15px] text-[#9ca3af] line-through font-normal'>
+                          <span className='text-[15px] font-body text-neutral-400 line-through font-normal'>
                             {typeof plan.anchorPrice === 'number'
                               ? `$${plan.anchorPrice}`
                               : plan.anchorPrice}
                           </span>
                         )}
                       </div>
-                      <p className='text-[12px] text-[#6b7280] mt-1'>
+                      <p className='text-[12px] font-body text-ink-muted mt-1'>
                         {typeof plan.credits === 'number'
                           ? `One-time payment · ${plan.credits.toLocaleString()} Credits`
                           : 'Custom enterprise volume'}
@@ -396,51 +338,36 @@ const BuyCredit = () => {
 
                     {/* CTA Button inside the gradient header */}
                     <div className='mt-4 relative z-10'>
-                      <button
-                        type='button'
+                      <Button
                         onClick={() => handlePlanAction(plan)}
-                        disabled={isProcessing}
-                        className={`w-full py-2.5 px-4 rounded-full font-semibold text-[14px] transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50 ${
-                          plan.btnType === 'dark'
-                            ? 'bg-[#1d1d1f] hover:bg-black text-white shadow-[0_2px_8px_rgba(0,0,0,0.18)]'
-                            : 'bg-white hover:bg-[#f9fafb] text-ink border border-black/10 shadow-[0_1px_3px_rgba(0,0,0,0.06)]'
-                        }`}
+                        loading={isProcessing}
+                        variant={plan.btnType === 'dark' ? 'primary' : 'secondary'}
+                        size='md'
+                        fullWidth={true}
                       >
-                        {isProcessing ? (
-                          <span className='inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin' />
-                        ) : plan.isCustom ? (
+                        {plan.isCustom ? (
                           plan.btnText
                         ) : user ? (
                           plan.btnText
                         ) : (
                           'Sign In to Purchase'
                         )}
-                      </button>
+                      </Button>
                     </div>
-                  </div>
+                  </CardInner>
 
                   {/* Bottom Features Checklist */}
                   <div className='px-4 pt-3.5 pb-2 flex flex-col justify-between flex-1'>
                     <ul className='space-y-2'>
                       {plan.features.slice(0, 4).map((feature, fIdx) => (
-                        <li key={fIdx} className='flex items-center gap-2 text-[13px] text-ink'>
-                          <svg
-                            className='w-3.5 h-3.5 text-emerald-600 shrink-0'
-                            viewBox='0 0 24 24'
-                            fill='none'
-                            stroke='currentColor'
-                            strokeWidth='2.4'
-                            strokeLinecap='round'
-                            strokeLinejoin='round'
-                          >
-                            <polyline points='20 6 9 17 4 12' />
-                          </svg>
+                        <li key={fIdx} className='flex items-center gap-2 text-[13px] font-body text-ink'>
+                          <Check className='w-3.5 h-3.5 text-emerald-600 shrink-0 stroke-[2.4]' />
                           <span className='leading-snug truncate'>{feature}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
-                </div>
+                </Card>
               )
             })}
           </motion.div>

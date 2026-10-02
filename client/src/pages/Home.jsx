@@ -1,8 +1,7 @@
 import React from 'react'
 import Header from '../components/Header'
-import Description from '../components/Description'
+import Description from '../components/Description.jsx'
 import Testimonials from '../components/Testimonials'
-import GenerateBtn from '../components/GenerateBtn'
 
 const Home = () => {
   return (
@@ -10,7 +9,6 @@ const Home = () => {
       <Header />
       <Description />
       <Testimonials />
-      <GenerateBtn />
     </div>
   )
 }

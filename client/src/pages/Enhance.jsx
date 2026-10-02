@@ -11,28 +11,10 @@ import {
   Zap,
 } from 'lucide-react'
 
-// Grain texture overlay matching BuyCredit.jsx & Usage.jsx
-const GrainOverlay = () => (
-  <div
-    className='absolute inset-0 pointer-events-none opacity-[0.035] mix-blend-overlay rounded-[20px]'
-    style={{
-      backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-    }}
-  />
-)
-
-// Gold Theme Orb matching BuyCredit.jsx AvatarOrb style
-const ThemeOrb = ({ icon: Icon }) => (
-  <div
-    className='relative w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-transform duration-300 hover:scale-105 shadow-[0_8px_18px_-2px_rgba(234,179,8,0.40)]'
-    style={{
-      background: 'radial-gradient(circle at 35% 30%, #fde047 0%, #eab308 55%, #b45309 100%)',
-    }}
-  >
-    <div className='absolute top-1.5 left-2 w-3.5 h-2 rounded-full bg-white/45 blur-[0.5px] -rotate-45 pointer-events-none' />
-    <Icon className='w-5 h-5 text-white z-10 stroke-[2]' />
-  </div>
-)
+import GrainOverlay from '../components/ui/GrainOverlay'
+import ThemeOrb from '../components/ui/ThemeOrb'
+import Button from '../components/ui/Button'
+import { Card, CardInner, PageHeader } from '../components/ui/Card'
 
 const Enhance = () => {
   const { enhanceImage, credit, user, setShowLogin } = useContext(AppContext)
@@ -122,14 +104,12 @@ const Enhance = () => {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className='mb-3 text-center flex flex-col items-center'
+          className='w-full'
         >
-          <h1 className='text-2xl sm:text-3xl lg:text-[34px] font-bold text-ink tracking-tight leading-tight'>
-            Restore clarity. Upscale every detail.
-          </h1>
-          <p className='text-sm sm:text-base text-[#6e6e73] mt-1 max-w-[520px] mx-auto'>
-            Upload any compressed, blurry, or low-resolution photo. Our neural engine synthesizes missing high-frequency details.
-          </p>
+          <PageHeader
+            title="Restore clarity. Upscale every detail."
+            subtitle="Upload any compressed, blurry, or low-resolution photo. Our neural engine synthesizes missing high-frequency details."
+          />
         </motion.div>
 
         {/* ── Upload Zone: Signature Double-Card Container ── */}
@@ -140,8 +120,9 @@ const Enhance = () => {
             transition={{ duration: 0.4 }}
             className='w-full max-w-[560px]'
           >
-            <div className='bg-white rounded-[24px] border border-[#e5e5e7] p-2.5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_36px_rgba(0,0,0,0.07)] transition-all duration-300'>
-              <div
+            <Card>
+              <CardInner
+                dashed
                 onClick={() => fileInputRef.current?.click()}
                 onDragOver={(e) => {
                   e.preventDefault()
@@ -149,7 +130,7 @@ const Enhance = () => {
                 }}
                 onDragLeave={() => setDragOver(false)}
                 onDrop={onDrop}
-                className={`rounded-[18px] p-6 sm:p-7 relative overflow-hidden border border-dashed transition-all cursor-pointer flex flex-col items-center justify-center gap-3 ${
+                className={`cursor-pointer flex flex-col items-center justify-center gap-3 ${
                   dragOver
                     ? 'border-amber-500 bg-amber-100/60 ring-4 ring-amber-500/10'
                     : 'border-amber-300/80 hover:border-amber-400 hover:bg-amber-50/40'
@@ -164,34 +145,38 @@ const Enhance = () => {
 
                 {/* Orb */}
                 <div className='relative z-10'>
-                  <ThemeOrb icon={Sparkles} />
+                  <ThemeOrb theme='gold' icon={Sparkles} />
                 </div>
 
                 {/* Text Block */}
                 <div className='relative z-10 text-center'>
-                  <h3 className='text-[18px] font-bold text-ink tracking-tight'>
+                  <h3 className='text-[18px] font-bold text-ink tracking-tight font-primary'>
                     {dragOver ? 'Drop image right here' : 'Choose an image to enhance & upscale'}
                   </h3>
-                  <p className='text-[12px] text-[#6b7280] mt-0.5'>
+                  <p className='text-xs text-ink-muted mt-0.5 font-sans'>
                     Drag & drop your photo here, or{' '}
                     <span className='text-amber-700 font-semibold underline underline-offset-2'>
                       browse computer
                     </span>
                   </p>
-                  <p className='text-[11px] text-[#9ca3af] mt-0.5'>
+                  <p className='text-[11px] text-ink-subtle mt-0.5 font-sans'>
                     Supports PNG, JPG, WEBP up to 25MB
                   </p>
                 </div>
 
                 {/* Action button inside dropzone */}
                 <div className='relative z-10'>
-                  <span className='inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white hover:bg-amber-50 text-amber-800 border border-amber-300/80 shadow-2xs text-[12px] font-semibold transition-all'>
-                    <Upload className='w-3.5 h-3.5' />
+                  <Button
+                    variant='secondary'
+                    size='sm'
+                    icon={Upload}
+                    className='text-amber-800 border-amber-300/80 hover:bg-amber-50'
+                  >
                     Select Image File
-                  </span>
+                  </Button>
                 </div>
-              </div>
-            </div>
+              </CardInner>
+            </Card>
           </motion.div>
         )}
 
@@ -214,9 +199,9 @@ const Enhance = () => {
               transition={{ duration: 0.3 }}
               className='w-full max-w-[540px] flex flex-col items-center gap-3.5'
             >
-              <div className='w-full bg-white rounded-[24px] border border-[#e5e5e7] p-2.5 shadow-[0_2px_12px_rgba(0,0,0,0.03)]'>
-                <div
-                  className='rounded-[18px] p-3 relative overflow-hidden border border-amber-200 flex flex-col items-center justify-center'
+              <Card className='w-full'>
+                <CardInner
+                  className='p-3 border-amber-200 flex flex-col items-center justify-center'
                   style={{
                     background: 'linear-gradient(180deg, #fef3c7 0%, #fffbeb 45%, #ffffff 100%)',
                   }}
@@ -234,45 +219,40 @@ const Enhance = () => {
                       <div className='absolute inset-0 bg-white/90 backdrop-blur-md flex flex-col items-center justify-center gap-3 z-20'>
                         <div className='w-9 h-9 border-3 border-amber-600 border-t-transparent rounded-full animate-spin' />
                         <div className='text-center'>
-                          <p className='text-ink font-bold text-[15px]'>
+                          <p className='text-ink font-bold text-[15px] font-primary'>
                             Enhancing details…
                           </p>
-                          <p className='text-[12px] text-[#6b7280] mt-0.5'>
+                          <p className='text-xs text-ink-muted mt-0.5 font-sans'>
                             Synthesizing high-frequency textures & 4K upscaling
                           </p>
                         </div>
                       </div>
                     )}
                   </div>
-                </div>
-              </div>
+                </CardInner>
+              </Card>
 
               {/* Actions */}
               <div className='flex flex-wrap gap-2.5 justify-center'>
-                <button
+                <Button
+                  variant='gold'
+                  size='md'
+                  disabled={loading}
+                  loading={loading}
+                  iconRight={!loading ? ArrowRight : undefined}
                   onClick={onSubmit}
-                  disabled={loading}
-                  className='px-7 py-2.5 rounded-full font-semibold text-[14px] bg-[#1d1d1f] hover:bg-black text-white shadow-[0_2px_10px_rgba(0,0,0,0.16)] transition-all flex items-center gap-2 active:scale-95 disabled:opacity-50 cursor-pointer'
                 >
-                  {loading ? (
-                    <>
-                      <span className='inline-block w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin' />
-                      <span>Upscaling…</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Enhance Image</span>
-                      <ArrowRight className='w-3.5 h-3.5' />
-                    </>
-                  )}
-                </button>
-                <button
-                  onClick={() => fileInputRef.current?.click()}
+                  Enhance Image
+                </Button>
+                <Button
+                  variant='secondary'
+                  size='md'
                   disabled={loading}
-                  className='px-5 py-2.5 rounded-full text-[13px] font-semibold bg-white hover:bg-amber-50 text-amber-800 border border-amber-300 shadow-2xs transition-all active:scale-95 cursor-pointer'
+                  onClick={() => fileInputRef.current?.click()}
+                  className='text-amber-800 border-amber-300 hover:bg-amber-50'
                 >
                   Change Image
-                </button>
+                </Button>
               </div>
             </motion.div>
           )}
@@ -286,9 +266,9 @@ const Enhance = () => {
               transition={{ duration: 0.3 }}
               className='w-full max-w-[580px] flex flex-col items-center gap-3.5'
             >
-              <div className='w-full bg-white rounded-[24px] border border-[#e5e5e7] p-2.5 shadow-[0_2px_12px_rgba(0,0,0,0.03)]'>
-                <div
-                  className='rounded-[18px] p-3 relative overflow-hidden border border-amber-200'
+              <Card className='w-full'>
+                <CardInner
+                  className='p-3 border-amber-200'
                   style={{
                     background: 'linear-gradient(180deg, #fef3c7 0%, #fffbeb 45%, #ffffff 100%)',
                   }}
@@ -332,19 +312,19 @@ const Enhance = () => {
                     </div>
 
                     {/* Pill labels */}
-                    <span className='absolute top-2.5 left-2.5 bg-white/90 backdrop-blur-md border border-amber-200 text-amber-900 text-[11px] font-semibold px-2.5 py-0.5 rounded-full shadow-2xs'>
+                    <span className='absolute top-2.5 left-2.5 bg-white/90 backdrop-blur-md border border-amber-200 text-amber-900 text-[11px] font-semibold px-2.5 py-0.5 rounded-full shadow-2xs font-primary'>
                       Original
                     </span>
-                    <span className='absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-md border border-amber-200 text-amber-900 text-[11px] font-semibold px-2.5 py-0.5 rounded-full shadow-2xs'>
+                    <span className='absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-md border border-amber-200 text-amber-900 text-[11px] font-semibold px-2.5 py-0.5 rounded-full shadow-2xs font-primary'>
                       Enhanced (4K)
                     </span>
                   </div>
 
-                  <p className='text-[12px] text-[#6b7280] text-center mt-2 font-medium'>
+                  <p className='text-xs text-ink-muted text-center mt-2 font-medium font-sans'>
                     Drag the divider across to compare fine sharpness, textures, and details
                   </p>
-                </div>
-              </div>
+                </CardInner>
+              </Card>
 
               {/* Actions */}
               <div className='flex flex-wrap gap-2.5 justify-center'>
@@ -353,18 +333,20 @@ const Enhance = () => {
                   download='enhanced-image.png'
                   target='_blank'
                   rel='noreferrer'
-                  className='px-7 py-2.5 rounded-full font-semibold text-[14px] bg-[#1d1d1f] hover:bg-black text-white shadow-[0_2px_10px_rgba(0,0,0,0.16)] transition-all flex items-center gap-2 active:scale-95 cursor-pointer'
+                  className='inline-flex items-center justify-center font-primary font-semibold select-none cursor-pointer transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-1 px-7 py-2.5 rounded-full text-sm bg-neutral-900 hover:bg-black text-white shadow-xs gap-2'
                 >
                   <Download className='w-3.5 h-3.5' />
                   <span>Download 4K Image</span>
                 </a>
-                <button
+                <Button
+                  variant='secondary'
+                  size='md'
+                  icon={RotateCcw}
                   onClick={reset}
-                  className='px-5 py-2.5 rounded-full text-[13px] font-semibold bg-white hover:bg-amber-50 text-amber-800 border border-amber-300 shadow-2xs transition-all flex items-center gap-2 active:scale-95 cursor-pointer'
+                  className='text-amber-800 border-amber-300 hover:bg-amber-50'
                 >
-                  <RotateCcw className='w-3.5 h-3.5' />
-                  <span>Try Another Photo</span>
-                </button>
+                  Try Another Photo
+                </Button>
               </div>
             </motion.div>
           )}

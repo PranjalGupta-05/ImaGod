@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion, type MotionValue } from "framer-motion";
 import { useTheme } from "next-themes";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
@@ -18,17 +18,18 @@ import {
 
 export interface WheelCarouselItem {
   label: string;
-  image: string;
+  image?: string;
   imageAlt?: string;
 }
 
 export type WheelCarouselMode = "system" | "light" | "dark" | "custom";
 
 export interface WheelCarouselProps {
-  items?: WheelCarouselItem[];
+  items?: (WheelCarouselItem | string)[];
   mode?: WheelCarouselMode;
   photoSide?: "left" | "right";
   photoWidth?: number;
+  showPhoto?: boolean;
   hidePhoto?: boolean;
   photoAspect?: "3/4" | "1/1" | "4/3" | "3/2";
   contentWidth?: number | string;
@@ -60,6 +61,8 @@ export interface WheelCarouselProps {
   scrollTriggered?: boolean;
   loop?: boolean;
   prefix?: React.ReactNode;
+  progress?: MotionValue<number>;
+  dial?: boolean;
   onActiveChange?: (item: WheelCarouselItem, index: number) => void;
   className?: string;
   photoClassName?: string;
@@ -69,7 +72,7 @@ export interface WheelCarouselProps {
 const unsplash = (id: string) =>
   `https://images.unsplash.com/photo-${id}?w=1200&q=80&auto=format&fit=crop`;
 
-export const wheelCarouselDefaultItems: WheelCarouselItem[] = [
+const wheelCarouselDefaultItems: WheelCarouselItem[] = [
   { label: "Halcyon Fields", image: unsplash("1520529890308-f503006340b4") },
   { label: "Meridian House", image: unsplash("1483366774565-c783b9f70e2c") },
   { label: "Norlight Pavilion", image: unsplash("1496865534669-25ec2a3a0fd3") },
@@ -120,6 +123,7 @@ export function WheelCarousel({
   mode = "system",
   photoSide = "left",
   photoWidth = 24,
+  showPhoto = true,
   hidePhoto = false,
   photoAspect = "3/4",
   contentWidth = 900,
@@ -151,6 +155,8 @@ export function WheelCarousel({
   scrollTriggered = false,
   loop = true,
   prefix,
+  progress,
+  dial = false,
   onActiveChange,
   className,
   photoClassName,
@@ -166,7 +172,10 @@ export function WheelCarousel({
         ? "dark"
         : "light"
       : mode;
-  const carouselItems = items.length ? items : wheelCarouselDefaultItems;
+  const carouselItems: WheelCarouselItem[] = useMemo(() => {
+    const raw = items && items.length > 0 ? items : wheelCarouselDefaultItems;
+    return raw.map((item) => (typeof item === "string" ? { label: item } : item));
+  }, [items]);
   const itemCount = carouselItems.length;
   const startingIndex = loop ? wrapIndex(activeIndex ?? initialIndex, itemCount) : Math.max(0, Math.min(itemCount - 1, activeIndex ?? initialIndex));
   const [rotation, setRotation] = useState(startingIndex);
@@ -197,30 +206,36 @@ export function WheelCarousel({
   }, [itemCount, loop]);
 
   const palette = useMemo(() => {
-    if (resolvedMode === "dark") {
+    const isDark = resolvedMode === "dark";
+    const bg =
+      background !== "rgb(255, 246, 236)"
+        ? background
+        : isDark
+        ? "#000000"
+        : "#ffffff";
+
+    const hasCustomText = textColor !== "rgba(180, 90, 20, 0.45)";
+    const hasCustomSelected = selectedColor !== "rgb(180, 84, 30)";
+    const hasCustomMarker = markerColor !== "rgb(232, 121, 46)";
+
+    // When background is transparent on this light canvas site, default to readable dark text
+    const treatAsDark = isDark && bg !== "transparent";
+
+    if (treatAsDark) {
       return {
-        background: "#000000",
-        text: "rgba(255, 255, 255, 0.5)",
-        selected: "#ffffff",
-        marker: "#2c6bff",
-        panel: "#141414",
-      };
-    }
-    if (resolvedMode === "light") {
-      return {
-        background: "#ffffff",
-        text: "rgba(0, 0, 0, 0.32)",
-        selected: "#0a0a0a",
-        marker: "#2c6bff",
-        panel: "#ededed",
+        background: bg,
+        text: hasCustomText ? textColor : "rgba(255, 255, 255, 0.5)",
+        selected: hasCustomSelected ? selectedColor : "#ffffff",
+        marker: hasCustomMarker ? markerColor : "#2c6bff",
+        panel: panelColor ?? "#141414",
       };
     }
     return {
-      background,
-      text: textColor,
-      selected: selectedColor,
-      marker: markerColor,
-      panel: panelColor ?? background,
+      background: bg,
+      text: hasCustomText ? textColor : "rgba(15, 23, 42, 0.35)",
+      selected: hasCustomSelected ? selectedColor : "#0f0f11",
+      marker: hasCustomMarker ? markerColor : "#0066cc",
+      panel: panelColor ?? "#ededed",
     };
   }, [
     background,
@@ -233,10 +248,20 @@ export function WheelCarousel({
 
   const commitRotation = useCallback(
     (nextRotation: number) => {
-      const clampedRotation = loop ? nextRotation : Math.max(0, Math.min(itemCount - 1, nextRotation));
+      const clampedRotation = loop
+        ? nextRotation
+        : Math.max(0, Math.min(itemCount - 1, nextRotation));
+
+      // Skip micro-jitter under 0.0001 to keep renders clean
+      if (Math.abs(clampedRotation - rotationRef.current) < 0.0001 && clampedRotation === rotationRef.current) {
+        return;
+      }
+
       rotationRef.current = clampedRotation;
       setRotation(clampedRotation);
-      const nextIndex = loop ? wrapIndex(Math.round(clampedRotation), itemCount) : Math.max(0, Math.min(itemCount - 1, Math.round(clampedRotation)));
+      const nextIndex = loop
+        ? wrapIndex(Math.round(clampedRotation), itemCount)
+        : Math.max(0, Math.min(itemCount - 1, Math.round(clampedRotation)));
       if (nextIndex !== selectedRef.current) {
         selectedRef.current = nextIndex;
         setSelectedIndex(nextIndex);
@@ -248,6 +273,22 @@ export function WheelCarousel({
 
   const commitRotationRef = useRef(commitRotation);
   commitRotationRef.current = commitRotation;
+
+  const isControlledProgress = progress !== undefined;
+
+  // Sync rotation continuously from external progress MotionValue
+  useEffect(() => {
+    if (!progress) return;
+
+    const handleProgress = (val: number) => {
+      const targetVal = reduceMotion ? Math.round(val) : val;
+      commitRotation(targetVal);
+    };
+
+    handleProgress(progress.get());
+    const unsubscribe = progress.on("change", handleProgress);
+    return () => unsubscribe();
+  }, [progress, commitRotation, reduceMotion]);
 
   // ScrollTrigger: play ONCE when scrolled into view, do not repeat continuously
   useEffect(() => {
@@ -324,6 +365,7 @@ export function WheelCarousel({
   );
 
   useEffect(() => {
+    if (isControlledProgress) return;
     const stage = stageRef.current;
     if (!stage) return;
 
@@ -338,7 +380,7 @@ export function WheelCarousel({
 
     stage.addEventListener("wheel", handleWheel, { passive: false });
     return () => stage.removeEventListener("wheel", handleWheel);
-  }, [commitRotation, runAnimation, scrollSpeed]);
+  }, [commitRotation, runAnimation, scrollSpeed, isControlledProgress]);
 
   useEffect(() => {
     if (activeIndex === undefined) return;
@@ -421,7 +463,7 @@ export function WheelCarousel({
     ? `linear-gradient(to bottom, transparent 0%, black ${edgeFadeSize}%, black ${100 - edgeFadeSize}%, transparent 100%)`
     : undefined;
 
-  const showPhotos = !hidePhoto && photoWidth > 0;
+  const showPhotos = showPhoto && !hidePhoto && photoWidth > 0;
   const apexStyle = typeof apexInset === "number" ? `${apexInset}%` : apexInset;
 
   return (
@@ -447,24 +489,19 @@ export function WheelCarousel({
         }
         tabIndex={0}
         className={cn(
-          "flex h-full w-full touch-none select-none items-stretch overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-current",
+          "flex h-full w-full select-none items-stretch overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-current",
+          !isControlledProgress && "touch-none",
           photoSide === "right" && "flex-row-reverse",
-          isDragging ? "cursor-grabbing" : "cursor-grab",
+          isControlledProgress ? "cursor-default" : isDragging ? "cursor-grabbing" : "cursor-grab",
         )}
         style={{ maxWidth: contentWidth, gap }}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerEnd}
-        onPointerCancel={handlePointerEnd}
+        onPointerDown={isControlledProgress ? undefined : handlePointerDown}
+        onPointerMove={isControlledProgress ? undefined : handlePointerMove}
+        onPointerUp={isControlledProgress ? undefined : handlePointerEnd}
+        onPointerCancel={isControlledProgress ? undefined : handlePointerEnd}
         onKeyDown={handleKeyDown}
       >
-        {prefix && (
-          <div className="flex shrink-0 items-center justify-start select-none mr-2 z-20">
-            {prefix}
-          </div>
-        )}
-
-        {showPhotos && (
+        {showPhotos && selectedItem?.image && (
           <div
             className="flex h-full shrink-0 items-center justify-center"
             style={{
@@ -502,9 +539,31 @@ export function WheelCarousel({
 
         <div
           className="relative h-full min-w-0 flex-1 overflow-hidden"
-          style={{ maskImage: mask, WebkitMaskImage: mask }}
+          style={{
+            maskImage: mask,
+            WebkitMaskImage: mask,
+            perspective: dial ? "900px" : undefined,
+            perspectiveOrigin: dial ? "left center" : undefined,
+            transformStyle: dial ? "preserve-3d" : undefined,
+          }}
         >
-          {showMarker && (
+          {prefix ? (
+            <div
+              aria-hidden="true"
+              className="absolute top-1/2 z-20 -translate-y-1/2 select-none pointer-events-none whitespace-nowrap"
+              style={{
+                right: `calc(100% - ${
+                  apexInset === 0
+                    ? showMarker
+                      ? `calc(${markerSize}px + ${markerGap}px)`
+                      : "0px"
+                    : apexStyle
+                } + ${markerGap}px)`,
+              }}
+            >
+              {prefix}
+            </div>
+          ) : showMarker ? (
             <span
               aria-hidden="true"
               className="absolute top-1/2 z-10 -translate-y-1/2 rounded-full"
@@ -516,7 +575,7 @@ export function WheelCarousel({
                 backgroundColor: palette.marker,
               }}
             />
-          )}
+          ) : null}
 
           {carouselItems.map((item, index) => {
             const offset = shortestOffset(index, rotation, itemCount, loop);
@@ -524,11 +583,6 @@ export function WheelCarousel({
 
             const angle = offset * spacing;
             const radians = (angle * Math.PI) / 180;
-            const x = -radius * (1 - Math.cos(radians));
-            const y = radius * Math.sin(radians);
-            const distance = Math.min(Math.abs(offset) / visibleItems, 1);
-            const opacity = Math.max(0, Math.cos((distance * Math.PI) / 2));
-            const scale = 1 - Math.min(Math.abs(offset) * 0.04, 0.45);
             const selected = Math.abs(offset) < 0.5;
 
             const leftPosition =
@@ -537,6 +591,78 @@ export function WheelCarousel({
                   ? `calc(${markerSize}px + ${markerGap}px)`
                   : "0px"
                 : apexStyle;
+
+            if (dial) {
+              const y = Math.sin(radians) * radius;
+              const z = Math.cos(radians) * radius - radius;
+              const rotateX = -angle * 0.72;
+              const dist = Math.abs(offset);
+              const opacity = Math.max(0, 1 - dist * 0.24);
+              const scale = Math.max(0.72, 1 - dist * 0.05);
+
+              const renderItemLabel = () => {
+                if (typeof item.label === "string") {
+                  const match = item.label.match(/^(you can\s+)(.*)$/i);
+                  if (match) {
+                    return (
+                      <span>
+                        <span className="font-normal opacity-65">{match[1]}</span>
+                        <span className={selected ? "font-bold" : "font-medium"}>{match[2]}</span>
+                      </span>
+                    );
+                  }
+                }
+                return item.label;
+              };
+
+              return (
+                <div
+                  id={`${instanceId}-item-${index}`}
+                  key={`${item.label}-${index}`}
+                  role="option"
+                  aria-selected={selected}
+                  className={cn(
+                    "pointer-events-none absolute top-1/2 origin-left whitespace-nowrap text-[clamp(1.15rem,2.2vw,1.9rem)] leading-none tracking-[-0.02em]",
+                    selected ? "font-extrabold" : "font-semibold",
+                    itemClassName,
+                  )}
+                  style={{
+                    left: leftPosition,
+                    color: selected ? palette.selected : palette.text,
+                    opacity,
+                    transform: `translate3d(0px, ${y.toFixed(2)}px, ${z.toFixed(2)}px) translateY(-50%) rotateX(${rotateX.toFixed(2)}deg) scale(${scale.toFixed(3)})`,
+                    transformStyle: "preserve-3d",
+                    backfaceVisibility: "hidden",
+                    willChange: "transform, opacity",
+                    WebkitFontSmoothing: "antialiased",
+                    transition: "color 0.22s cubic-bezier(0.16, 1, 0.3, 1)",
+                  }}
+                >
+                  {renderItemLabel()}.
+                </div>
+              );
+            }
+
+            const x = -radius * (1 - Math.cos(radians));
+            const y = radius * Math.sin(radians);
+            const distance = Math.min(Math.abs(offset) / visibleItems, 1);
+            const opacity = Math.max(0, Math.cos((distance * Math.PI) / 2));
+            const scale = 1 - Math.min(Math.abs(offset) * 0.04, 0.45);
+
+            const renderItemLabel = () => {
+              if (typeof item.label === "string") {
+                const match = item.label.match(/^(you can\s+)(.*)$/i);
+                if (match) {
+                  return (
+                    <span>
+                      <span className="font-normal opacity-65">{match[1]}</span>
+                      <span className={selected ? "font-bold" : "font-medium"}>{match[2]}</span>
+                    </span>
+                  );
+                }
+              }
+              return item.label;
+            };
 
             return (
               <div
@@ -552,10 +678,14 @@ export function WheelCarousel({
                   left: leftPosition,
                   color: selected ? palette.selected : palette.text,
                   opacity,
-                  transform: `translate(${x}px, ${y}px) translateY(-50%) rotate(${angle}deg) scale(${scale})`,
+                  transform: `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0px) translateY(-50%) rotate(${angle.toFixed(2)}deg) scale(${scale.toFixed(3)})`,
+                  willChange: "transform, opacity",
+                  backfaceVisibility: "hidden",
+                  WebkitFontSmoothing: "antialiased",
+                  transition: "color 0.22s cubic-bezier(0.16, 1, 0.3, 1)",
                 }}
               >
-                {item.label}
+                {renderItemLabel()}
               </div>
             );
           })}
