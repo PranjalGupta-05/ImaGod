@@ -1,8 +1,8 @@
-# 🎨 Imagify — AI-Powered Creative Studio
+# 🎨 ImaGod — AI-Powered Creative Studio
 
 > **Hackathon Track: Your Media-Savvy Startup**
 >
-> Imagify is a full-stack, SaaS-style AI image creation and editing platform where **Cloudinary is the engine**, not just the file host. Every core feature — text-to-image generation, background removal, photo enhancement, generative replace, generative recolor, outpainting, and deblurring — runs through Cloudinary's AI and transformation pipeline in real time.
+> ImaGod is a full-stack, SaaS-style AI image creation and editing platform where **Cloudinary is the engine**, not just the file host. Every core feature — text-to-image generation, background removal, photo enhancement, generative replace, generative recolor, outpainting, and deblurring — runs through Cloudinary's AI and transformation pipeline in real time.
 
 [![Built with Cloudinary](https://img.shields.io/badge/Built%20with-Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)](#cloudinary-integration)
 [![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](#tech-stack)
@@ -14,7 +14,7 @@
 ## 📋 Table of Contents
 
 - [The Problem](#-the-problem)
-- [Our Solution](#-our-solution--imagify)
+- [Our Solution](#-our-solution--ImaGod)
 - [Features at a Glance](#-features-at-a-glance)
 - [How We Used Cloudinary (Deep Dive)](#-how-we-used-cloudinary-deep-dive)
 - [Architecture](#-architecture)
@@ -44,15 +44,15 @@ Creators shouldn't need five browser tabs and three subscriptions to go from an 
 
 ---
 
-## 💡 Our Solution — Imagify
+## 💡 Our Solution — ImaGod
 
-Imagify is a **single-platform creative studio** that bundles seven distinct AI-powered image operations into one cohesive product, with a pay-per-use credit system and a full media history — all powered end-to-end by **Cloudinary**.
+ImaGod is a **single-platform creative studio** that bundles seven distinct AI-powered image operations into one cohesive product, with a pay-per-use credit system and a full media history — all powered end-to-end by **Cloudinary**.
 
 > Think of it as *"Canva's AI tools meets a Cloudinary-native backend"* — every pixel is processed, stored, transformed, searched, and delivered through Cloudinary.
 
 ### Why This Is a "Media-Savvy Startup"
 
-Imagify isn't a static file uploader with a Cloudinary widget bolted on. Cloudinary is **structurally integral** to the product:
+ImaGod isn't a static file uploader with a Cloudinary widget bolted on. Cloudinary is **structurally integral** to the product:
 
 - **Without Cloudinary**, there is no image generation, no background removal, no enhancement, no outpainting — the product literally cannot function.
 - We use **7 distinct Cloudinary capabilities** across the Upload, Admin, Search, URL-based Transformation, and Generation APIs.
@@ -85,7 +85,7 @@ Imagify isn't a static file uploader with a Cloudinary widget bolted on. Cloudin
 POST https://api.cloudinary.com/v2/generate/{cloud_name}/text_to_image
 ```
 
-We call Cloudinary's **Text-to-Image Generation API** directly. The prompt (optionally enriched with a style suffix like "cinematic composition, dramatic volumetric lighting…") is sent with quality preference `auto`, and the resulting managed asset is stored under `imagify/generated/{timestamp}`.
+We call Cloudinary's **Text-to-Image Generation API** directly. The prompt (optionally enriched with a style suffix like "cinematic composition, dramatic volumetric lighting…") is sent with quality preference `auto`, and the resulting managed asset is stored under `ImaGod/generated/{timestamp}`.
 
 **Why Cloudinary and not a raw Stable Diffusion endpoint?**
 Because Cloudinary stores the result as a *managed asset* — it's immediately available on the CDN, searchable, taggable, and transformable without any extra upload step.
@@ -96,7 +96,7 @@ Because Cloudinary stores the result as a *managed asset* — it's immediately a
 
 ```js
 cloudinary.uploader.upload_stream({
-    folder: 'imagify/bg-removal',
+    folder: 'ImaGod/bg-removal',
     background_removal: 'cloudinary_ai',
     tags: [userId]
 });
@@ -110,7 +110,7 @@ We upload the user's image as a stream with the `background_removal: 'cloudinary
 
 For Enhancement, Generative Replace, Generative Recolor, Generative Fill, and Unblur, we:
 
-1. **Upload** the source image to a feature-specific folder (e.g., `imagify/enhance/`, `imagify/gen-fill/`)
+1. **Upload** the source image to a feature-specific folder (e.g., `ImaGod/enhance/`, `ImaGod/gen-fill/`)
 2. **Construct a transformation URL** using `cloudinary.url()` with chained effects
 3. **Return the URL** — Cloudinary processes the transformation on first request and caches it on the CDN
 
@@ -139,7 +139,7 @@ cloudinary.uploader.add_tag(userId, [publicId]);
 The History page then queries:
 ```js
 cloudinary.search
-    .expression(`public_id:imagify/* AND tags=${userId}`)
+    .expression(`public_id:ImaGod/* AND tags=${userId}`)
     .sort_by('created_at', 'desc')
     .max_results(50)
     .with_field('tags')
@@ -179,10 +179,10 @@ If a user's local usage counters are zero (e.g., after a data migration), the `/
 
 ```js
 cloudinary.search
-    .expression(`public_id:imagify/* AND tags=${userId}`)
+    .expression(`public_id:ImaGod/* AND tags=${userId}`)
     .max_results(500)
     .execute();
-// Then count: imagify/generated/* → textToImage, imagify/bg-removal/* → removeBg, etc.
+// Then count: ImaGod/generated/* → textToImage, ImaGod/bg-removal/* → removeBg, etc.
 ```
 
 ---
@@ -281,7 +281,7 @@ cloudinary.search
 ## 📂 Project Structure
 
 ```
-Imagify-V2/
+ImaGod-V2/
 ├── client/                          # React frontend (Vite)
 │   ├── public/                      # Static assets
 │   ├── src/
@@ -354,8 +354,8 @@ Imagify-V2/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/PranjalGupta-05/Imagify-V2.git
-cd Imagify-V2
+git clone https://github.com/PranjalGupta-05/ImaGod-V2.git
+cd ImaGod-V2
 ```
 
 ### 2. Install Dependencies
@@ -527,13 +527,13 @@ You can independently verify that Cloudinary is doing real work:
 
 1. Log into your [Cloudinary Console](https://console.cloudinary.com/)
 2. Navigate to **Media Library** → you should see folders:
-   - `imagify/generated/` — AI-generated images
-   - `imagify/bg-removal/` — Background removal originals
-   - `imagify/enhance/` — Enhanced image originals
-   - `imagify/gen-replace/` — Generative replace originals
-   - `imagify/gen-recolor/` — Recolor originals
-   - `imagify/gen-fill/` — Outpainting originals
-   - `imagify/unblur/` — Deblurred originals
+   - `ImaGod/generated/` — AI-generated images
+   - `ImaGod/bg-removal/` — Background removal originals
+   - `ImaGod/enhance/` — Enhanced image originals
+   - `ImaGod/gen-replace/` — Generative replace originals
+   - `ImaGod/gen-recolor/` — Recolor originals
+   - `ImaGod/gen-fill/` — Outpainting originals
+   - `ImaGod/unblur/` — Deblurred originals
 3. Each asset should have a **tag** matching the user's MongoDB `_id`
 4. Click any asset → check the **Derived Images** tab to see the cached transformations
 
@@ -570,7 +570,7 @@ You can independently verify that Cloudinary is doing real work:
 
 ## 💳 Credits & Monetisation
 
-Imagify uses a **credit-based pay-per-use** model:
+ImaGod uses a **credit-based pay-per-use** model:
 
 | Plan | Credits | Price (USD) |
 |---|---|---|
@@ -591,5 +591,5 @@ This project was built for a hackathon submission. All rights reserved by the au
 
 <p align="center">
   <b>Built with ❤️ and Cloudinary</b><br/>
-  <i>Imagify — Where every pixel is powered by Cloudinary.</i>
+  <i>ImaGod — Where every pixel is powered by Cloudinary.</i>
 </p>
