@@ -1,4 +1,4 @@
-﻿import React, { useContext, useRef, useState, useCallback } from 'react'
+import React, { useContext, useRef, useState, useCallback } from 'react'
 import { AppContext } from '../context/AppContext'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Focus, Sparkles, Upload, Download, RotateCcw, RefreshCw, Zap, Sliders } from 'lucide-react'
@@ -371,7 +371,7 @@ const Unblur = () => {
                 <>
                   <a
                     href={resultImage}
-                    download="imagify-unblurred.jpg"
+                    download="imagod-unblurred.jpg"
                     target="_blank"
                     rel="noreferrer"
                     className="px-5 py-2.5 rounded-full bg-sky-600 hover:bg-sky-500 text-white text-xs sm:text-sm font-semibold shadow-sm transition-all flex items-center gap-1.5"

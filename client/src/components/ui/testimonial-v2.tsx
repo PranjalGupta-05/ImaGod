@@ -13,7 +13,7 @@ export interface Testimonial {
 // --- Data tailored for Imagify & Creative Suite ---
 export const testimonials: Testimonial[] = [
   {
-    text: "Imagify completely transformed our design workflow. The text-to-image synthesis produces studio-grade keyframes in seconds, saving us days of conceptual modeling.",
+    text: "ImaGod completely transformed our design workflow. The text-to-image synthesis produces studio-grade keyframes in seconds, saving us days of conceptual modeling.",
     image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
     name: "Briana Patton",
     role: "Creative Director · Studio Pixel",
@@ -34,7 +34,7 @@ export const testimonials: Testimonial[] = [
     stars: 5,
   },
   {
-    text: "We migrated our entire marketing asset generation pipeline to Imagify. Fast turnaround, pristine lighting coherence, and an intuitive UI that requires zero training.",
+    text: "We migrated our entire marketing asset generation pipeline to ImaGod. Fast turnaround, pristine lighting coherence, and an intuitive UI that requires zero training.",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
     name: "Omar Raza",
     role: "Head of Growth",
@@ -55,7 +55,7 @@ export const testimonials: Testimonial[] = [
     stars: 5,
   },
   {
-    text: "Our e-commerce product listings saw a 38% conversion boost after using Imagify to create stylized lifestyle backdrops for our catalog.",
+    text: "Our e-commerce product listings saw a 38% conversion boost after using ImaGod to create stylized lifestyle backdrops for our catalog.",
     image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80",
     name: "Farhan Siddiqui",
     role: "E-Commerce Director",
@@ -69,7 +69,7 @@ export const testimonials: Testimonial[] = [
     stars: 5,
   },
   {
-    text: "From raw ideas to final 4K renders in minutes. Imagify delivers the highest fidelity outputs among all generative platforms we have benchmarked.",
+    text: "From raw ideas to final 4K renders in minutes. ImaGod delivers the highest fidelity outputs among all generative platforms we have benchmarked.",
     image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80",
     name: "Hassan Ali",
     role: "Principal 3D & Concept Artist",
@@ -213,7 +213,7 @@ export default function TestimonialV2() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-center mt-3.5 text-neutral-500 text-base sm:text-lg leading-relaxed max-w-lg font-normal font-sans"
           >
-            See what designers, art directors, and creative studios accomplish with Imagify.
+            See what designers, art directors, and creative studios accomplish with ImaGod.
           </motion.p>
         </div>
 

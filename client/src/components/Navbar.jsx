@@ -123,16 +123,16 @@ const Navbar = () => {
               <div className='flex items-center shrink-0'>
                 <Link
                   to='/'
-                  aria-label='Imagify Home'
+                  aria-label='ImaGod Home'
                   className='flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-focus transition-transform active:scale-95 group'
                 >
                   <img
                     src="/logo.png"
-                    alt="Imagify"
+                    alt="ImaGod"
                     className="w-6 h-6 sm:w-7 sm:h-7 object-contain shrink-0 transition-transform group-hover:scale-105 duration-200"
                   />
-                  <span className='font-display text-ink font-bold text-[18px] tracking-tight lowercase'>
-                    imagify
+                  <span className='font-display text-ink font-bold text-[18px] tracking-tight'>
+                    ImaGod
                   </span>
                 </Link>
               </div>

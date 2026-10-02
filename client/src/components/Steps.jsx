@@ -30,7 +30,7 @@ const Steps = () => {
           }}
           className="text-3xl sm:text-4xl lg:text-[46px] text-ink font-bold max-w-[760px] mx-auto font-primary"
         >
-          How Imagify delivers <span className="text-primary font-bold">studio excellence</span>
+          How ImaGod delivers <span className="text-primary font-bold">studio excellence</span>
         </motion.h2>
 
         <motion.p

@@ -343,7 +343,7 @@ export default function Result() {
 
                               <a
                                 href={msg.image}
-                                download={`imagify-${Date.now()}.png`}
+                                download={`imagod-${Date.now()}.png`}
                                 className='p-2 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md text-white transition-all shadow-md'
                                 title='Download Image'
                               >
@@ -541,7 +541,7 @@ export default function Result() {
               <div className='w-full mt-4 flex items-center justify-end px-2'>
                 <a
                   href={lightboxImage}
-                  download={`imagify-${Date.now()}.png`}
+                  download={`imagod-${Date.now()}.png`}
                   className='px-5 py-2 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium transition-colors shadow-md'
                 >
                   Download Master (PNG)

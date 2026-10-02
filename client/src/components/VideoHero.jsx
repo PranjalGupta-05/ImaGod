@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useContext, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Sparkles } from 'lucide-react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { AppContext } from '../context/AppContext'
@@ -10,11 +10,12 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger)
 }
 
-// Configuration block for hero scroll scrubbing
+// Configuration block for hero scroll scrubbing & pipeline integration
 const CONFIG = {
-  FRAME_COUNT: 169, // Clamps exactly at the high-res eye frame to prevent washing out into blank white frames
-  PIN_HEIGHT: '450vh',
+  FRAME_COUNT: 270, // Merged Hero 2 (0-170) -> Hero 3 (171-269)
+  PIN_HEIGHT: '650vh', // Generous scroll runway for video scrubbing + alternating pipeline journey
   SCRUB: 0.5,
+  VIDEO_END_PROGRESS: 0.42, // Video completes at 0.42, then locks at frame 269 while Pipeline scrolls in blank space
 }
 
 // Complete feature suite for vertical marquee
@@ -29,12 +30,56 @@ const ALL_CAPABILITIES = [
   { tag: '08', title: 'Batch Processing', desc: 'Process multiple creative assets at scale with speed.' },
 ]
 
-// Minimal creation pipeline steps for the eye frame
-const PIPELINE_STEPS = [
-  { num: '01', title: 'Prompt', desc: 'Natural language idea input' },
-  { num: '02', title: 'Synthesis', desc: 'Sub-second neural generation' },
-  { num: '03', title: 'Refine', desc: 'Detail & lighting enhancement' },
-  { num: '04', title: 'Export', desc: 'Lossless 4K commercial asset' },
+// 6-Stage Creation Pipeline Data — strictly alternating: 01 UP, 02 DOWN, 03 UP, 04 DOWN, 05 UP, 06 DOWN
+const PIPELINE_PHASES = [
+  {
+    step: '01',
+    side: 'up',
+    phase: 'Input & Parsing',
+    title: 'Intent Parsing',
+    content: 'Translates natural prompts into spatial lighting, composition, and studio focal lengths.',
+    tags: ['Natural Language', 'Auto-Composition'],
+  },
+  {
+    step: '02',
+    side: 'down',
+    phase: 'Real-Time Compute',
+    title: 'Sub-3s Inference',
+    content: 'Dedicated multi-GPU tensor clusters deliver real-time diffusion in under 3 seconds.',
+    tags: ['< 3s Latency', 'Tensor Clusters'],
+  },
+  {
+    step: '03',
+    side: 'up',
+    phase: 'Latent Synthesis',
+    title: 'Physical Lighting',
+    content: 'Trained on studio masters for realistic skin tones, true anatomy, and volumetric diffusion.',
+    tags: ['True Anatomy', 'Volumetric Depth'],
+  },
+  {
+    step: '04',
+    side: 'down',
+    phase: 'Refinement',
+    title: '4K Super-Resolution',
+    content: 'Reconstructs micro-textures, fabric weaves, and crisp typography with zero blur.',
+    tags: ['4K Native', 'Micro-Detail'],
+  },
+  {
+    step: '05',
+    side: 'up',
+    phase: 'Segmentation',
+    title: 'Sub-Pixel Matting',
+    content: 'Single-click foreground isolation down to flyaway hair for instant alpha cutout PNGs.',
+    tags: ['Sub-Pixel Mask', '1-Click Cutout'],
+  },
+  {
+    step: '06',
+    side: 'down',
+    phase: 'Studio Handoff',
+    title: 'Lossless Export',
+    content: 'Instant download in 16-bit lossless PNG and WebP with full commercial usage rights.',
+    tags: ['16-Bit PNG', 'Full Rights'],
+  },
 ]
 
 // Helper to compute scene opacity & translation windows
@@ -61,6 +106,8 @@ const VideoHero = () => {
   const containerRef = useRef(null)
   const stageRef = useRef(null)
   const canvasRef = useRef(null)
+  const pipelineBoxRef = useRef(null)
+  const trackRef = useRef(null)
   const imagesRef = useRef([])
   const currentFrameRef = useRef(0)
   const rafScheduledRef = useRef(false)
@@ -69,6 +116,7 @@ const VideoHero = () => {
   const [scrollProgress, setScrollProgress] = useState(0)
   const [loadedCount, setLoadedCount] = useState(0)
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+  const [maxTrackShift, setMaxTrackShift] = useState(1200)
 
   // Navigation handler for Get Started
   const handleGetStarted = useCallback(() => {
@@ -191,15 +239,32 @@ const VideoHero = () => {
     }
   }, [renderFrame])
 
-  // Window resize handler to maintain sharp canvas aspect
+  // Window resize handler to maintain sharp canvas aspect and measure track shift
   useEffect(() => {
     const handleResize = () => {
       renderFrame(currentFrameRef.current)
+      if (trackRef.current && pipelineBoxRef.current) {
+        const diff = trackRef.current.scrollWidth - pipelineBoxRef.current.clientWidth + 100
+        setMaxTrackShift(Math.max(400, diff))
+      }
       ScrollTrigger.refresh()
     }
+
+    handleResize()
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [renderFrame])
+
+  // Measure pipeline track width after mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (trackRef.current && pipelineBoxRef.current) {
+        const diff = trackRef.current.scrollWidth - pipelineBoxRef.current.clientWidth + 100
+        setMaxTrackShift(Math.max(400, diff))
+      }
+    }, 400)
+    return () => clearTimeout(timer)
+  }, [])
 
   // GSAP ScrollTrigger pinning and scroll scrubbing
   useEffect(() => {
@@ -224,8 +289,14 @@ const VideoHero = () => {
         const progress = self.progress
         setScrollProgress(progress)
 
-        const rawFrame = Math.round(progress * (CONFIG.FRAME_COUNT - 1))
-        const frameIndex = Math.min(CONFIG.FRAME_COUNT - 1, Math.max(0, rawFrame))
+        // Scrub video up to VIDEO_END_PROGRESS (0.42), then lock at frame 269
+        let frameIndex = 0
+        if (progress < CONFIG.VIDEO_END_PROGRESS) {
+          const videoT = progress / CONFIG.VIDEO_END_PROGRESS
+          frameIndex = Math.min(CONFIG.FRAME_COUNT - 1, Math.round(videoT * (CONFIG.FRAME_COUNT - 1)))
+        } else {
+          frameIndex = CONFIG.FRAME_COUNT - 1
+        }
 
         if (frameIndex !== currentFrameRef.current) {
           currentFrameRef.current = frameIndex
@@ -247,42 +318,45 @@ const VideoHero = () => {
     }
   }, [prefersReducedMotion, renderFrame])
 
-
-  // Text Scenes (4 scenes across scroll progress 0.0 to 1.0)
-  // Scene 1: 0.00 - 0.28
+  // Narrative Text Scenes during Hero 2 and initial Hero 3 (0.00 to 0.42)
+  // Scene 1: 0.00 - 0.15 (Initial hero state + Marquee)
   const scene1 = prefersReducedMotion
     ? { opacity: 1, translateY: 0 }
-    : getSceneTransform(scrollProgress, 0.0, 0.0, 0.18, 0.28)
+    : getSceneTransform(scrollProgress, 0.0, 0.0, 0.11, 0.16)
 
-  // Scene 2: 0.28 - 0.55
+  // Scene 2: 0.16 - 0.28 (From idea to finished artwork)
   const scene2 = prefersReducedMotion
     ? { opacity: 0, translateY: 20 }
-    : getSceneTransform(scrollProgress, 0.26, 0.33, 0.46, 0.54)
+    : getSceneTransform(scrollProgress, 0.16, 0.20, 0.26, 0.29)
 
-  // Scene 3: 0.55 - 0.78
+  // Scene 3: 0.29 - 0.41 (Razor-sharp fine detail zooming into eye)
   const scene3 = prefersReducedMotion
     ? { opacity: 0, translateY: 20 }
-    : getSceneTransform(scrollProgress, 0.52, 0.59, 0.71, 0.77)
+    : getSceneTransform(scrollProgress, 0.29, 0.33, 0.38, 0.41)
 
-  // Scene 4: 0.74 - 0.96 (Smoothly dissolves out before scroll ends so nothing lingers on screen)
-  const scene4 = prefersReducedMotion
-    ? { opacity: 0, translateY: 20 }
-    : getSceneTransform(scrollProgress, 0.74, 0.81, 0.91, 0.96)
-
-  // Creation pipeline stepping during the eye frame (Scene 4: 0.74 to 0.91)
-  const pipelineProgress = prefersReducedMotion
+  // CREATION PIPELINE SCRUB (Starts at 0.42 right as Hero 3 completes zoom out)
+  const pipelineOpacity = prefersReducedMotion
     ? 1
-    : Math.max(0, Math.min(1, (scrollProgress - 0.74) / (0.91 - 0.74)))
+    : Math.min(1, Math.max(0, (scrollProgress - 0.41) / 0.03))
 
-  const activePipelineIndex = Math.min(
-    PIPELINE_STEPS.length - 1,
-    Math.floor(pipelineProgress * PIPELINE_STEPS.length)
+  // Horizontal travel progress across the blank space (0.44 to 0.95)
+  const pipelineT = prefersReducedMotion
+    ? 1
+    : Math.min(1, Math.max(0, (scrollProgress - 0.44) / (0.95 - 0.44)))
+
+  // Current horizontal translation of the pipeline slider
+  const pipelineTranslateX = -pipelineT * maxTrackShift
+
+  // Active phase index based on scroll (0 to 5)
+  const activePhaseIndex = Math.min(
+    PIPELINE_PHASES.length - 1,
+    Math.max(0, Math.floor(pipelineT * PIPELINE_PHASES.length))
   )
 
-  // Interactive jump to pipeline step
-  const handlePipelineStepClick = useCallback((index) => {
+  // Interactive jump to any phase on click
+  const handlePhaseClick = useCallback((index) => {
     if (!containerRef.current) return
-    const targetProgress = 0.75 + (index / 3.5) * 0.22
+    const targetProgress = 0.44 + (index / (PIPELINE_PHASES.length - 0.5)) * 0.51
     const totalScrollable = containerRef.current.offsetHeight - window.innerHeight
     window.scrollTo({
       top: targetProgress * totalScrollable,
@@ -329,7 +403,7 @@ const VideoHero = () => {
 
         {/* Dual Flanking Typography Layer: Left and Right balanced typography */}
         <div className="relative z-20 w-full max-w-[1440px] mx-auto px-6 sm:px-10 lg:px-12 xl:px-16 flex items-center justify-between min-h-screen pointer-events-none">
-          {/* Left Column (Primary Narrative & Headings) - Clean direct typography without enclosing container */}
+          {/* Left Column (Primary Narrative & Headings) */}
           <div className="w-full max-w-[360px] sm:max-w-[400px] lg:max-w-[430px] text-left relative min-h-[320px] sm:min-h-[350px] flex items-center pointer-events-none">
 
             {/* SCENE 1 (Initial Hero State) */}
@@ -429,95 +503,9 @@ const VideoHero = () => {
               </p>
             </div>
 
-            {/* SCENE 4 (Eye Frame Trigger & Studio Launch) */}
-            <div
-              style={{
-                opacity: scene4.opacity,
-                transform: `translateY(${scene4.translateY}px)`,
-                pointerEvents: scene4.opacity > 0.05 ? 'auto' : 'none',
-                visibility: scene4.opacity > 0 ? 'visible' : 'hidden',
-              }}
-              className="absolute inset-x-0 transition-opacity duration-75"
-            >
-              {/* Soft ambient backlight diffusion for high-contrast visibility against eye canvas */}
-              <div className="absolute -inset-10 -z-10 rounded-full bg-white/75 blur-3xl pointer-events-none" />
-
-              <h2
-                style={{
-                  fontFamily: "'Poppins', sans-serif",
-                  fontSize: 'clamp(1.95rem, 2.7vw, 2.65rem)',
-                  lineHeight: 1.14,
-                  letterSpacing: '-0.025em',
-                  fontWeight: 700,
-                }}
-                className="text-ink max-w-[360px] font-primary [text-shadow:_0_1px_16px_rgba(255,255,255,0.95)]"
-              >
-                Create without{' '}
-                <br />
-                <span className="text-primary font-bold">limitations</span>
-              </h2>
-
-              <p className="font-sans text-[15px] sm:text-[16px] font-medium leading-[1.65] text-neutral-900 mt-4 max-w-[340px] [text-shadow:_0_1px_10px_rgba(255,255,255,0.9)]">
-                Speed, precision, and complete creative control over every image you produce.
-              </p>
-
-              <div className="mt-7 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                <button
-                  type="button"
-                  onClick={handleGetStarted}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary hover:bg-primary-focus text-white font-semibold text-[14px] sm:text-[15px] shadow-[0_2px_12px_rgba(0,102,204,0.25)] hover:shadow-[0_4px_20px_rgba(0,102,204,0.35)] active:scale-[0.98] transition-all duration-200 cursor-pointer font-primary pointer-events-auto"
-                >
-                  Generate images
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-
-                <p className="font-sans text-[12px] sm:text-[13px] text-neutral-800 font-semibold [text-shadow:_0_1px_8px_rgba(255,255,255,0.9)]">
-                  Free credits included.
-                </p>
-              </div>
-
-              {/* Mobile Minimal Creation Pipeline Stepper */}
-              <div className="md:hidden mt-8 pt-5 border-t border-black/[0.1] flex items-center justify-between w-full max-w-[340px]">
-                {PIPELINE_STEPS.map((step, idx) => {
-                  const isActive = idx === activePipelineIndex
-                  const isPast = idx < activePipelineIndex
-
-                  return (
-                    <button
-                      key={step.num}
-                      type="button"
-                      onClick={() => handlePipelineStepClick(idx)}
-                      className="flex flex-col items-center gap-1.5 cursor-pointer pointer-events-auto"
-                    >
-                      <div
-                        className={`w-2 h-2 rounded-full transition-all duration-200 ${
-                          isActive
-                            ? 'bg-primary scale-125 ring-2 ring-primary/25'
-                            : isPast
-                            ? 'bg-ink'
-                            : 'bg-neutral-300'
-                        }`}
-                      />
-                      <span
-                        className={`text-[10px] font-mono tracking-tight transition-colors duration-200 ${
-                          isActive
-                            ? 'text-primary font-bold'
-                            : isPast
-                            ? 'text-neutral-800 font-semibold'
-                            : 'text-neutral-500 font-medium'
-                        }`}
-                      >
-                        {step.num} {step.title}
-                      </span>
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-
           </div>
 
-          {/* Right Column Area: Holds Scene 1 Marquee and Scene 4 Creation Pipeline */}
+          {/* Right Column Area: Holds Scene 1 Marquee and Scene 3 Typography */}
           <div className="hidden md:flex flex-col w-full max-w-[280px] lg:max-w-[320px] text-left relative min-h-[350px] justify-center pointer-events-none">
             {/* Scene 1: Dynamic Vertical Marquee Capabilities List (Visible ONLY during Scene 1) */}
             <div
@@ -529,7 +517,6 @@ const VideoHero = () => {
               }}
               className="absolute inset-0 flex flex-col justify-center transition-opacity duration-75"
             >
-              {/* Vertical Infinite Marquee Window with Top & Bottom Feather Masks - Clean direct track without container card */}
               <div className="relative h-[250px] sm:h-[275px] overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_14%,black_86%,transparent)] pointer-events-auto">
                 <div className="vertical-marquee-track flex flex-col gap-3.5 py-2">
                   {[...ALL_CAPABILITIES, ...ALL_CAPABILITIES].map((item, idx) => (
@@ -576,7 +563,6 @@ const VideoHero = () => {
               }}
               className="absolute inset-0 flex flex-col justify-center transition-opacity duration-75 text-left"
             >
-              {/* Soft ambient backlight diffusion for high-contrast visibility against canvas */}
               <div className="absolute -inset-10 -z-10 rounded-full bg-white/75 blur-3xl pointer-events-none" />
 
               <h2
@@ -598,112 +584,277 @@ const VideoHero = () => {
                 Lifelike textures, clean edges, and natural lighting crafted for commercial creative work.
               </p>
             </div>
+          </div>
 
-            {/* Scene 4: Minimal Creation Pipeline (Visible ONLY during Scene 4: Eye Frame) */}
-            <div
-              style={{
-                opacity: scene4.opacity,
-                transform: `translateY(${scene4.translateY}px)`,
-                pointerEvents: scene4.opacity > 0.05 ? 'auto' : 'none',
-                visibility: scene4.opacity > 0 ? 'visible' : 'hidden',
-              }}
-              className="absolute inset-0 flex flex-col justify-center transition-opacity duration-75"
-            >
-              {/* Soft ambient diffusion backdrop for razor-sharp readability */}
-              <div className="absolute -inset-10 -z-10 rounded-full bg-white/75 blur-3xl pointer-events-none" />
+        </div>
 
-              {/* Minimalist Section Header */}
-              <div className="flex items-center gap-2.5 mb-7 pointer-events-none">
-                <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                <span className="text-[11px] sm:text-[12px] font-mono uppercase tracking-[0.2em] text-neutral-800 font-bold [text-shadow:_0_1px_8px_rgba(255,255,255,0.9)]">
-                  Creation Pipeline
+        {/* ========================================================================= */}
+        {/* CREATION PIPELINE IN THE BLANK SPACE: STRICTLY ALTERNATING (UP / DOWN) */}
+        {/* Starts from right after Hero3 ends. Guaranteed zero overlapping with android */}
+        {/* ========================================================================= */}
+        <div
+          ref={pipelineBoxRef}
+          id="how-it-works"
+          style={{
+            opacity: pipelineOpacity,
+            pointerEvents: pipelineOpacity > 0.05 ? 'auto' : 'none',
+            visibility: pipelineOpacity > 0 ? 'visible' : 'hidden',
+          }}
+          className="absolute top-0 bottom-0 left-0 md:left-[45%] lg:left-[47%] right-0 overflow-hidden flex items-center z-30 transition-opacity duration-200 [mask-image:linear-gradient(to_right,transparent,black_44px,black)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_44px,black)]"
+        >
+          {/* Horizontal sliding track that moves smoothly across the blank space */}
+          <div
+            ref={trackRef}
+            style={{
+              transform: `translate3d(${pipelineTranslateX}px, 0, 0)`,
+              willChange: 'transform',
+            }}
+            className="flex items-center h-[500px] sm:h-[530px] pl-8 sm:pl-12 pr-28 py-2 shrink-0 relative transition-transform duration-75 ease-out select-none"
+          >
+            {/* Left Header Section inside track */}
+            <div className="w-[220px] sm:w-[250px] h-[400px] flex flex-col justify-between py-4 pr-6 shrink-0 border-r border-neutral-200/80 mr-6">
+              {/* Top Header Label */}
+              <div>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/[0.08] text-primary text-[11px] font-semibold tracking-wide uppercase mb-3 font-mono">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                  How It Works
                 </span>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-black/[0.06] text-neutral-600 font-semibold ml-auto">
-                  Step {activePipelineIndex + 1}/4
-                </span>
+                <h3
+                  style={{
+                    fontFamily: "'Poppins', sans-serif",
+                    letterSpacing: '-0.025em',
+                    lineHeight: 1.1,
+                    fontWeight: 700,
+                  }}
+                  className="text-2xl sm:text-[28px] font-bold text-ink font-primary"
+                >
+                  Creation <br />
+                  <span className="text-primary font-bold">Pipeline</span>
+                </h3>
               </div>
 
-              {/* Stepper with clear vertical hairline & node progression */}
-              <div className="relative flex flex-col gap-6 pl-5 border-l-2 border-neutral-300/80">
-                {/* Active progress hairline fill */}
+              {/* Bottom Architecture Progress Label */}
+              <div className="pt-4 border-t border-neutral-100">
+                <span className="text-[10px] font-mono font-semibold uppercase tracking-[0.16em] text-neutral-400 block mb-1">
+                  Architecture
+                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[15px] font-bold text-ink font-primary">
+                    Phase {String(activePhaseIndex + 1).padStart(2, '0')}
+                  </span>
+                  <span className="text-[12px] font-mono text-neutral-400">/ 06</span>
+                </div>
+                <div className="mt-2.5 flex items-center gap-1.5 text-[11.5px] font-medium text-neutral-400">
+                  <span>Scroll to explore</span>
+                  <span className="text-[13px]">→</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Alternating Phases Rail & Columns Container */}
+            <div className="relative flex items-center shrink-0 h-[420px] sm:h-[450px]">
+              {/* Central Horizontal Timeline Track Rail (Only between First Node and Last Node, stops before Launch Card) */}
+              <div className="absolute left-[140px] right-[140px] top-1/2 -translate-y-1/2 h-[2px] bg-neutral-200/90 rounded-full pointer-events-none z-10">
+                {/* Active Primary Blue Fill Line */}
                 <div
                   style={{
-                    height: `${Math.min(100, Math.max(8, ((activePipelineIndex + 0.6) / PIPELINE_STEPS.length) * 100))}%`,
+                    width: `${Math.min(100, Math.max(0, (pipelineT / 0.88) * 100))}%`,
                   }}
-                  className="absolute left-[-2px] top-0 w-[2px] bg-primary transition-all duration-300 ease-out shadow-[0_0_8px_rgba(0,102,204,0.5)]"
+                  className="h-full bg-primary rounded-full transition-all duration-100 ease-out shadow-[0_0_8px_rgba(0,102,204,0.5)]"
                 />
+              </div>
 
-                {PIPELINE_STEPS.map((step, idx) => {
-                  const isActive = idx === activePipelineIndex
-                  const isPast = idx < activePipelineIndex
+              {/* 6 Sequentially Alternating Phase Columns */}
+              <div className="flex items-center gap-6 sm:gap-7 shrink-0 h-full relative z-20">
+                {PIPELINE_PHASES.map((item, idx) => {
+                  const isUp = item.side === 'up'
+                  // Threshold for when this phase is reached
+                  const threshold = (idx / (PIPELINE_PHASES.length - 1)) * 0.85
+                  const isActive = pipelineT >= threshold
+                  const isCurrent = activePhaseIndex === idx
 
                   return (
                     <div
-                      key={step.num}
-                      onClick={() => handlePipelineStepClick(idx)}
-                      className={`relative transition-all duration-300 cursor-pointer pointer-events-auto group ${
-                        isActive
-                          ? 'opacity-100 translate-x-1.5'
-                          : isPast
-                          ? 'opacity-90 hover:opacity-100'
-                          : 'opacity-75 hover:opacity-100'
-                      }`}
+                      key={item.step}
+                      onClick={() => handlePhaseClick(idx)}
+                      className="w-[280px] sm:w-[295px] h-full flex flex-col justify-between shrink-0 relative cursor-pointer group"
                     >
-                      {/* Node dot on connecting line */}
-                      <div
-                        className={`absolute -left-[27px] top-1 rounded-full border-2 border-white transition-all duration-300 ${
-                          isActive
-                            ? 'w-3.5 h-3.5 bg-primary scale-110 shadow-[0_0_12px_rgba(0,102,204,0.6)]'
-                            : isPast
-                            ? 'w-3 h-3 bg-ink'
-                            : 'w-3 h-3 bg-neutral-300 group-hover:bg-neutral-400'
-                        }`}
-                      />
+                      {/* TOP HALF SLOT */}
+                      <div className="h-[185px] sm:h-[195px] flex flex-col justify-end relative">
+                        {isUp && (
+                          <>
+                            {/* Card Content (Phase 01, 03, 05) */}
+                            <div
+                              className={`rounded-2xl p-4 sm:p-4.5 border transition-all duration-300 backdrop-blur-md ${
+                                isCurrent
+                                  ? 'bg-white border-primary/50 shadow-[0_10px_32px_rgba(0,102,204,0.12)] scale-[1.02] ring-1 ring-primary/20'
+                                  : isActive
+                                  ? 'bg-white/95 border-neutral-200/90 shadow-[0_4px_16px_rgba(0,0,0,0.04)] group-hover:border-primary/40'
+                                  : 'bg-white/90 border-neutral-200/60 shadow-[0_2px_8px_rgba(0,0,0,0.02)] opacity-85 group-hover:opacity-100 group-hover:border-neutral-300'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <span
+                                  className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10.5px] font-semibold tracking-wide uppercase transition-colors duration-200 ${
+                                    isActive
+                                      ? 'bg-primary text-white shadow-xs'
+                                      : 'bg-primary/[0.08] text-primary'
+                                  }`}
+                                >
+                                  <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-white' : 'bg-primary'}`} />
+                                  Phase {item.step}
+                                </span>
+                                <span className="text-[10px] font-mono font-medium text-neutral-400 uppercase tracking-wider">
+                                  {item.phase}
+                                </span>
+                              </div>
 
-                      <div className="flex items-baseline gap-2.5">
-                        <span
-                          className={`font-mono text-[11px] tracking-wider transition-colors duration-200 ${
-                            isActive
-                              ? 'text-primary font-bold'
-                              : isPast
-                              ? 'text-ink font-semibold'
-                              : 'text-neutral-500 font-semibold'
-                          }`}
-                        >
-                          {step.num}
-                        </span>
-                        <span
-                          className={`font-primary text-[15px] sm:text-[16px] tracking-tight transition-colors duration-200 [text-shadow:_0_1px_8px_rgba(255,255,255,0.95)] ${
-                            isActive
-                              ? 'text-ink font-bold group-hover:text-primary'
-                              : isPast
-                              ? 'text-neutral-800 font-semibold'
-                              : 'text-neutral-700 font-semibold group-hover:text-ink'
-                          }`}
-                        >
-                          {step.title}
-                        </span>
+                              <h4 className="text-[15px] sm:text-[15.5px] font-bold text-ink leading-tight font-primary tracking-tight group-hover:text-primary transition-colors">
+                                {item.title}
+                              </h4>
+
+                              <p className="text-[12px] sm:text-[12.5px] text-neutral-600 mt-1 leading-[1.45] font-sans">
+                                {item.content}
+                              </p>
+
+                              <div className="flex flex-wrap gap-1.5 mt-2.5 pt-1 border-t border-neutral-100">
+                                {item.tags.map((tag, tIdx) => (
+                                  <span
+                                    key={tIdx}
+                                    className={`text-[9.5px] font-medium px-2 py-0.5 rounded transition-colors ${
+                                      isActive
+                                        ? 'bg-primary/[0.06] text-primary/90 border border-primary/15'
+                                        : 'bg-neutral-100 text-neutral-600'
+                                    }`}
+                                  >
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Connecting Stem from Card down to Rail Node */}
+                            <div className="w-[2px] h-5 sm:h-6 bg-neutral-200/90 mx-auto pointer-events-none mt-1">
+                              <div
+                                style={{ height: isActive ? '100%' : '0%' }}
+                                className="w-full bg-primary transition-all duration-200"
+                              />
+                            </div>
+                          </>
+                        )}
                       </div>
 
-                      <p
-                        className={`font-sans text-[12.5px] sm:text-[13px] mt-0.5 leading-snug transition-colors duration-200 [text-shadow:_0_1px_8px_rgba(255,255,255,0.95)] ${
-                          isActive
-                            ? 'text-neutral-800 font-medium'
-                            : isPast
-                            ? 'text-neutral-600 font-normal'
-                            : 'text-neutral-500 font-normal group-hover:text-neutral-700'
-                        }`}
-                      >
-                        {step.desc}
-                      </p>
+                      {/* CENTER RAIL NODE */}
+                      <div className="relative flex items-center justify-center h-6 z-30 pointer-events-none">
+                        <div
+                          className={`w-3.5 h-3.5 rounded-full border-2 bg-white transition-all duration-300 flex items-center justify-center ${
+                            isActive
+                              ? 'border-primary bg-primary scale-125 ring-4 ring-primary/20 shadow-[0_0_12px_rgba(0,102,204,0.6)]'
+                              : 'border-neutral-300 group-hover:border-neutral-400'
+                          }`}
+                        >
+                          {isActive && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                        </div>
+                      </div>
+
+                      {/* BOTTOM HALF SLOT */}
+                      <div className="h-[185px] sm:h-[195px] flex flex-col justify-start relative">
+                        {!isUp && (
+                          <>
+                            {/* Connecting Stem from Rail Node down to Card */}
+                            <div className="w-[2px] h-5 sm:h-6 bg-neutral-200/90 mx-auto pointer-events-none mb-1">
+                              <div
+                                style={{ height: isActive ? '100%' : '0%' }}
+                                className="w-full bg-primary transition-all duration-200"
+                              />
+                            </div>
+
+                            {/* Card Content (Phase 02, 04, 06) */}
+                            <div
+                              className={`rounded-2xl p-4 sm:p-4.5 border transition-all duration-300 backdrop-blur-md ${
+                                isCurrent
+                                  ? 'bg-white border-primary/50 shadow-[0_10px_32px_rgba(0,102,204,0.12)] scale-[1.02] ring-1 ring-primary/20'
+                                  : isActive
+                                  ? 'bg-white/95 border-neutral-200/90 shadow-[0_4px_16px_rgba(0,0,0,0.04)] group-hover:border-primary/40'
+                                  : 'bg-white/90 border-neutral-200/60 shadow-[0_2px_8px_rgba(0,0,0,0.02)] opacity-85 group-hover:opacity-100 group-hover:border-neutral-300'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <span
+                                  className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10.5px] font-semibold tracking-wide uppercase transition-colors duration-200 ${
+                                    isActive
+                                      ? 'bg-primary text-white shadow-xs'
+                                      : 'bg-primary/[0.08] text-primary'
+                                  }`}
+                                >
+                                  <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-white' : 'bg-primary'}`} />
+                                  Phase {item.step}
+                                </span>
+                                <span className="text-[10px] font-mono font-medium text-neutral-400 uppercase tracking-wider">
+                                  {item.phase}
+                                </span>
+                              </div>
+
+                              <h4 className="text-[15px] sm:text-[15.5px] font-bold text-ink leading-tight font-primary tracking-tight group-hover:text-primary transition-colors">
+                                {item.title}
+                              </h4>
+
+                              <p className="text-[12px] sm:text-[12.5px] text-neutral-600 mt-1 leading-[1.45] font-sans">
+                                {item.content}
+                              </p>
+
+                              <div className="flex flex-wrap gap-1.5 mt-2.5 pt-1 border-t border-neutral-100">
+                                {item.tags.map((tag, tIdx) => (
+                                  <span
+                                    key={tIdx}
+                                    className={`text-[9.5px] font-medium px-2 py-0.5 rounded transition-colors ${
+                                      isActive
+                                        ? 'bg-primary/[0.06] text-primary/90 border border-primary/15'
+                                        : 'bg-neutral-100 text-neutral-600'
+                                    }`}
+                                  >
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          </>
+                        )}
+                      </div>
                     </div>
                   )
                 })}
               </div>
+
+              {/* End of Pipeline: Ready to Create Launch Card (Completely free of any line cutting through) */}
+              <div className="w-[270px] sm:w-[290px] h-[340px] flex flex-col justify-center items-center text-center p-6 rounded-3xl bg-gradient-to-br from-white via-white/95 to-primary/[0.04] border border-primary/20 shadow-[0_10px_32px_rgba(0,102,204,0.08)] shrink-0 ml-10 relative z-20">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-3.5 shadow-xs">
+                  <Sparkles className="w-6 h-6 text-primary" />
+                </div>
+
+                <h4 className="text-[18px] font-bold text-ink font-primary tracking-tight">
+                  Ready to create?
+                </h4>
+
+                <p className="text-[12.5px] text-neutral-500 font-sans mt-1.5 leading-relaxed">
+                  Turn your imagination into photorealistic master assets in seconds.
+                </p>
+
+                <button
+                  type="button"
+                  onClick={handleGetStarted}
+                  className="mt-5 inline-flex items-center justify-center gap-2 w-full py-3 rounded-full bg-primary hover:bg-primary-focus text-white font-semibold text-[13.5px] shadow-[0_4px_16px_rgba(0,102,204,0.25)] hover:shadow-[0_6px_22px_rgba(0,102,204,0.35)] active:scale-[0.98] transition-all duration-200 cursor-pointer font-primary pointer-events-auto"
+                >
+                  Generate images
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+
+                <span className="text-[11px] font-sans text-neutral-400 mt-2 font-medium">
+                  Free credits included · No credit card
+                </span>
+              </div>
             </div>
-
           </div>
-
         </div>
 
       </div>

@@ -235,7 +235,7 @@ const BuyCredit = () => {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
       amount: order.amount,
       currency: order.currency,
-      name: 'Imagify Credits Payment',
+      name: 'ImaGod Credits Payment',
       description: 'Studio Credit Pack Purchase',
       order_id: order.id,
       receipt: order.receipt,
@@ -278,7 +278,7 @@ const BuyCredit = () => {
   const handlePlanAction = async (plan) => {
     if (plan.isCustom) {
       window.location.href =
-        'mailto:sales@imagify.ai?subject=Imagify%20Enterprise%20Inquiry&body=Hello%20Imagify%20Team%2C%0A%0AWe%20would%20like%20to%20learn%20more%20about%20the%20Enterprise%20plan%20for%20our%20organization.%0A%0ATeam%20Size%3A%0AEstimated%20Credits%20Per%20Month%3A%0A%0AThank%20you!'
+        'mailto:sales@imagod.ai?subject=ImaGod%20Enterprise%20Inquiry&body=Hello%20ImaGod%20Team%2C%0A%0AWe%20would%20like%20to%20learn%20more%20about%20the%20Enterprise%20plan%20for%20our%20organization.%0A%0ATeam%20Size%3A%0AEstimated%20Credits%20Per%20Month%3A%0A%0AThank%20you!'
       return
     }
 

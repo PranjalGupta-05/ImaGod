@@ -98,7 +98,7 @@ function FlipCard({ src, index, target, title, prompt, onSelect }) {
         >
           <div className='w-full'>
             <span className='text-[9px] font-semibold text-blue-400 uppercase tracking-wider block mb-1'>
-              Imagify AI
+              ImaGod AI
             </span>
             <p className='text-[11px] font-medium leading-tight text-white line-clamp-3'>
               {title}

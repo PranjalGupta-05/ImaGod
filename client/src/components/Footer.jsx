@@ -74,7 +74,7 @@ const Footer = () => {
 
           {/* Col 3 */}
           <div>
-            <h4 className='font-caption-strong text-ink mb-3'>Imagify Studio</h4>
+            <h4 className='font-caption-strong text-ink mb-3'>ImaGod Studio</h4>
             <ul className='space-y-1 text-[13px]'>
               <li>
                                 <Link to='/' className='text-[#6e6e73] hover:text-primary transition-colors'>
@@ -131,10 +131,10 @@ const Footer = () => {
         <div className='pt-6 border-t border-neutral-200/60 flex flex-col sm:flex-row items-center justify-between gap-4'>
           <div className='flex items-center gap-3'>
             <span className='font-display text-ink font-semibold text-[14px]'>
-              Imagify
+              ImaGod
             </span>
             <span className='font-fine-print text-ink-muted48'>
-              Copyright © 2026 Imagify Inc. All rights reserved.
+              Copyright © 2026 ImaGod Inc. All rights reserved.
             </span>
           </div>
 

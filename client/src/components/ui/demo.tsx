@@ -1,10 +1,11 @@
-import React from "react";
-import ScrollAnimation from "@/components/ui/you-can-scroll";
+"use client";
 
-export default function DemoOne() {
+import { WheelCarousel } from "@/components/ui/wheel-carousel";
+
+export default function WheelCarouselDemo() {
   return (
-    <div className="w-full min-h-screen">
-      <ScrollAnimation />
+    <div className="h-screen w-full">
+      <WheelCarousel />
     </div>
   );
 }
