@@ -180,34 +180,38 @@ export default function TestimonialV2() {
         {/* Header Stack */}
         <div className="flex flex-col items-center justify-center max-w-[640px] mx-auto mb-14 text-center">
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="flex justify-center"
+            className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-neutral-100/80 border border-neutral-200/80 text-neutral-600 text-[11px] sm:text-xs font-medium tracking-[0.08em] uppercase mb-4 shadow-xs font-sans"
           >
-            <div className="px-3 py-1 bg-neon text-black font-extrabold text-[11px] sm:text-xs tracking-widest uppercase shadow-xs">
-              COMMUNITY VOICE · 03
-            </div>
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            <span>Community Voice · 03</span>
           </motion.div>
 
           <motion.h2 
             id="testimonials-heading" 
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-display text-4xl sm:text-5xl lg:text-[56px] font-extrabold uppercase text-ink tracking-[-0.03em] leading-[0.96] mt-5 text-center"
+            transition={{ duration: 0.6 }}
+            style={{
+              fontFamily: "'Poppins', sans-serif",
+              letterSpacing: '-0.025em',
+              lineHeight: 1.1,
+            }}
+            className="text-3xl sm:text-4xl lg:text-[46px] text-ink font-bold max-w-[760px] mx-auto font-primary text-center"
           >
-            LOVED BY CREATORS WORLDWIDE
+            Loved by creators <span className="text-primary font-bold">worldwide</span>
           </motion.h2>
 
           <motion.p 
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-center mt-4 text-neutral-600 text-base sm:text-lg leading-relaxed max-w-lg font-normal"
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-center mt-3.5 text-neutral-500 text-base sm:text-lg leading-relaxed max-w-lg font-normal font-sans"
           >
             See what designers, art directors, and creative studios accomplish with Imagify.
           </motion.p>
