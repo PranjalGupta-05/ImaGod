@@ -37,11 +37,19 @@ export default {
           DEFAULT: '#e8ff3b',
           hover: '#d4f932',
         },
+        glass: 'var(--glass)',
+        'glass-tint': 'var(--glass-tint)',
+        'glass-edge': 'var(--glass-edge)',
+      },
+      backgroundImage: {
+        'glass-shine': 'var(--glass-shine)',
       },
       boxShadow: {
         card: '0 2px 12px rgba(0,0,0,0.03)',
         'card-hover': '0 12px 36px rgba(0,0,0,0.07)',
         floating: '0 8px 24px rgba(0,0,0,0.12)',
+        glass: 'var(--glass-shadow)',
+        'glass-inner': 'var(--glass-inner-shadow)',
       },
       fontFamily: {
         primary: ['"Poppins"', 'sans-serif'],

@@ -23,6 +23,62 @@
 
   --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.03);
   --shadow-card-hover: 0 12px 36px rgba(0, 0, 0, 0.07);
+
+  /* Liquid Glass Design Tokens - Reduced Opacity, Ultra Clear */
+  --glass: oklch(0.99 0.005 250 / 0.04);
+  --glass-tint: oklch(0.99 0.005 250 / 0.05);
+  --glass-edge: oklch(1 0 0 / 0.32);
+
+  --glass-shine: linear-gradient(
+    118deg,
+    oklch(1 0 0 / 0.25) 0%,
+    oklch(1 0 0 / 0.06) 24%,
+    transparent 48%,
+    oklch(1 0 0 / 0.03) 72%,
+    oklch(1 0 0 / 0.15) 100%
+  );
+
+  --glass-shadow:
+    0 1px 0 oklch(1 0 0 / 0.3),
+    0 8px 25px oklch(0.2 0.02 250 / 0.05);
+
+  --glass-inner-shadow:
+    inset 1px 1px 1px oklch(1 0 0 / 0.45),
+    inset -1px -1px 1px oklch(0.2 0.02 250 / 0.04);
+}
+
+.dark {
+  --glass: oklch(0.22 0.02 250 / 0.10);
+  --glass-tint: oklch(0.3 0.02 250 / 0.06);
+  --glass-edge: oklch(1 0 0 / 0.12);
+
+  --glass-shadow:
+    0 1px 0 oklch(1 0 0 / 0.10),
+    0 10px 30px oklch(0 0 0 / 0.18);
+
+  --glass-inner-shadow:
+    inset 1px 1px 1px oklch(1 0 0 / 0.15),
+    inset -1px -1px 1px oklch(0 0 0 / 0.10);
+}
+
+/* Explicit fallback utilities for liquid glass */
+.border-glass-edge {
+  border-color: var(--glass-edge);
+}
+.bg-glass {
+  background-color: var(--glass);
+}
+.bg-glass-tint {
+  background-color: var(--glass-tint);
+}
+.bg-glass-shine {
+  background-image: var(--glass-shine);
+}
+.shadow-glass {
+  box-shadow: var(--glass-shadow);
+}
+.shadow-glass-inner {
+  box-shadow: var(--glass-inner-shadow);
 }
 
 html, body, #root {

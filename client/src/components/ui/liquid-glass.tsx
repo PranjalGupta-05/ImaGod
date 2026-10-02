@@ -12,74 +12,109 @@ export const GlassEffect = ({
   contentClassName,
   style,
   ...props
-}: GlassEffectProps) => (
-  <div
-    className={cn("relative overflow-hidden border border-white/60 shadow-[0_8px_30px_rgba(0,0,0,0.04)]", className)}
-    style={{
-      ...style,
-    }}
-    {...props}
-  >
-    {/* Distortion + blur layer */}
+}: GlassEffectProps) => {
+  return (
     <div
-      className="pointer-events-none absolute inset-0 z-0"
-      style={{
-        borderRadius: "inherit",
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
-        filter: "url(#glass-distortion)",
-        isolation: "isolate",
-      }}
-    />
-    {/* Tint layer */}
-    <div
-      className="pointer-events-none absolute inset-0 z-10"
-      style={{ borderRadius: "inherit", background: "rgba(255,255,255,0.4)" }}
-    />
-    {/* Edge highlight layer */}
-    <div
-      className="pointer-events-none absolute inset-0 z-20"
-      style={{
-        borderRadius: "inherit",
-        boxShadow:
-          "inset 1.5px 1.5px 1px 0 rgba(255,255,255,0.7), inset -1px -1px 1px 0 rgba(255,255,255,0.25)",
-      }}
-    />
-    {/* Content Container: propagates full dimensions and flex rules */}
-    <div className={cn("relative z-30 w-full h-full", contentClassName)}>{children}</div>
-  </div>
-);
+      className={cn(
+        "group/glass relative isolate overflow-hidden border border-glass-edge bg-glass shadow-glass",
+        className,
+      )}
+      style={style}
+      {...props}
+    >
+      {/* Background blur and refraction */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0 backdrop-blur-md backdrop-saturate-125"
+        style={{
+          borderRadius: "inherit",
+          filter: "url(#liquid-glass-distortion)",
+        }}
+      />
+
+      {/* Translucent tint */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-10 bg-glass-tint"
+        style={{ borderRadius: "inherit" }}
+      />
+
+      {/* Directional light reflection */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-20 bg-glass-shine opacity-30 transition-opacity duration-300 group-hover/glass:opacity-60 motion-reduce:transition-none"
+        style={{ borderRadius: "inherit" }}
+      />
+
+      {/* Crisp liquid edge */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-20 shadow-glass-inner"
+        style={{ borderRadius: "inherit" }}
+      />
+
+      {/* Existing navbar content remains unchanged */}
+      <div className={cn("relative z-30 h-full w-full", contentClassName)}>
+        {children}
+      </div>
+    </div>
+  );
+};
 
 export const GlassFilter = () => (
   <svg
     aria-hidden="true"
     width="0"
     height="0"
-    style={{ position: "absolute", pointerEvents: "none", opacity: 0 }}
+    className="pointer-events-none absolute"
+    style={{ position: "absolute", width: 0, height: 0, overflow: "hidden" }}
   >
-    <filter
-      id="glass-distortion"
-      x="0%"
-      y="0%"
-      width="100%"
-      height="100%"
-      filterUnits="objectBoundingBox"
-    >
-      <feTurbulence
-        type="fractalNoise"
-        baseFrequency="0.002 0.008"
-        numOctaves="1"
-        seed="17"
-        result="turbulence"
-      />
-      <feGaussianBlur in="turbulence" stdDeviation="2.5" result="softMap" />
-      <feDisplacementMap
-        in="SourceGraphic"
-        in2="softMap"
-        scale="24"
-        xChannelSelector="R"
-        yChannelSelector="G"
-      />
-    </filter>
+    <defs>
+      <filter
+        id="liquid-glass-distortion"
+        x="-15%"
+        y="-25%"
+        width="130%"
+        height="150%"
+        colorInterpolationFilters="sRGB"
+      >
+        <feTurbulence
+          type="fractalNoise"
+          baseFrequency="0.006 0.018"
+          numOctaves="2"
+          seed="8"
+          result="noise"
+        />
+
+        <feGaussianBlur
+          in="noise"
+          stdDeviation="1.5"
+          result="softNoise"
+        />
+
+        <feDisplacementMap
+          in="SourceGraphic"
+          in2="softNoise"
+          scale="16"
+          xChannelSelector="R"
+          yChannelSelector="G"
+          result="distorted"
+        />
+
+        <feGaussianBlur
+          in="distorted"
+          stdDeviation="0.25"
+          result="softened"
+        />
+
+        <feComposite
+          in="softened"
+          in2="SourceGraphic"
+          operator="over"
+        />
+      </filter>
+    </defs>
   </svg>
 );
+
+export default GlassEffect;
