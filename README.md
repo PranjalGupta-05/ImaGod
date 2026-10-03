@@ -1,5 +1,7 @@
 # 🎨 ImaGod — AI-Powered Creative Studio
 
+## [DEMO VIDEO](https://drive.google.com/file/d/1J7sgcsiQw9Xe2mmh6Kj0MWvk28ZnV6ls/view?usp=sharing)
+
 > **Hackathon Track: Your Media-Savvy Startup**
 >
 > ImaGod is a full-stack, SaaS-style AI image creation and editing platform where **Cloudinary is the engine**, not just the file host. Every core feature — text-to-image generation, background removal, photo enhancement, generative replace, generative recolor, outpainting, and deblurring — runs through Cloudinary's AI and transformation pipeline in real time.
