@@ -1,6 +1,7 @@
 # 🎨 ImaGod — AI-Powered Creative Studio
 
 ## [DEMO VIDEO](https://drive.google.com/file/d/1J7sgcsiQw9Xe2mmh6Kj0MWvk28ZnV6ls/view?usp=sharing)
+## [Project Live Link](https://ima-god.vercel.app)
 
 > **Hackathon Track: Your Media-Savvy Startup**
 >
